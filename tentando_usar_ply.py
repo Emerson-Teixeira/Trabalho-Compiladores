@@ -11,21 +11,25 @@ reservado = {
     'then': 'THEN',
     'read': 'READ',
     'else': 'ELSE',
+    'integer': 'INTEGER',
+    'real':'REAL',
+    'array':'ARRAY',
+    'record':'RECORD',
+    'function':'FUNCTION',
+    'of':'OF',
 }
 
-tokens = ['NUMERO', 'ID', 'OP_MAT', 'OP_LOGICO'] + list(reservado.values())
+tokens = ['NUMERO', 'ID', 'OP_MAT', 'OP_LOGICO','ATRIBUICAO'] + list(reservado.values())
 
-literals = ";.,[]()"
+literals = ";.,[]():"
 
 def t_NUMERO(t):
     r'(\d+\.\d+)|(\d+)' #Nesse caso será aceito 1.5 mas não 1. nem .5
-    print( "O token " + t.value + " é um real" )
     return t
 
 def t_ID(t):
     r'[a-zA-Z][a-zA-Z0-9]*'
     t.type = reservado.get(t.value,'ID')
-    print( t.type)
     return t
 
 def t_OP_LOGICO(t):
@@ -40,14 +44,18 @@ def t_error(t):
      print("Não é possivel identificar o caractere: '%s'" % t.value[0])
      t.lexer.skip(1)
 
-t_ignore = ' \t'
+def t_ATRIBUICAO(t):
+    r'\:='
+    return t
+
+t_ignore = ' \t \n'
 
 lexer = lex.lex()
 
-lexer.input('; . , [ ] + - * / > < = ! ( )')
+lexer.input('const TAM = 10; type vetor = array [15] of integer; result := m / 2 nota1 : real; nota2 : real; end;')
 
 while True:
     tok = lexer.token()
     if not tok: 
         break
-    print(tok.type, tok.value, tok.lineno, tok.lexpos)      # No more input
+    print(tok.type)      # No more input
