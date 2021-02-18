@@ -13,7 +13,9 @@ reservado = {
     'else': 'ELSE',
 }
 
-tokens = ['NUMERO', 'ID', 'OPERADOR_MAT'] + list(reservado.values())
+tokens = ['NUMERO', 'ID', 'OP_MAT', 'OP_LOGICO'] + list(reservado.values())
+
+literals = ";.,[]()"
 
 def t_NUMERO(t):
     r'(\d+\.\d+)|(\d+)' #Nesse caso será aceito 1.5 mas não 1. nem .5
@@ -26,6 +28,14 @@ def t_ID(t):
     print( t.type)
     return t
 
+def t_OP_LOGICO(t):
+    r'>|<|=|!'
+    return t
+
+def t_OP_MAT(t):
+    r'\+|-|\*|/'
+    return t
+
 def t_error(t):
      print("Não é possivel identificar o caractere: '%s'" % t.value[0])
      t.lexer.skip(1)
@@ -34,7 +44,7 @@ t_ignore = ' \t'
 
 lexer = lex.lex()
 
-lexer.input('else')
+lexer.input('; . , [ ] + - * / > < = ! ( )')
 
 while True:
     tok = lexer.token()
