@@ -7,6 +7,7 @@ reservado = {
     'type': 'TYPE',
     'var': 'VAR',
     'while':'WHILE',
+    'write': 'WRITE',
     'if': 'IF',
     'then': 'THEN',
     'read': 'READ',
@@ -21,7 +22,7 @@ reservado = {
 
 tokens = ['NUMERO', 'ID', 'OP_MAT', 'OP_LOGICO','ATRIBUICAO'] + list(reservado.values())
 
-literals = ";.,[]():"
+literals = ";.,[]():\" \'"
 
 def t_NUMERO(t):
     r'(\d+\.\d+)|(\d+)' #Nesse caso será aceito 1.5 mas não 1. nem .5
@@ -52,7 +53,7 @@ t_ignore = ' \t \n'
 
 lexer = lex.lex()
 
-lexer.input('const TAM = 10; type vetor = array [15] of integer; result := m / 2 nota1 : real; nota2 : real; end;')
+lexer.input('const TAM = 10; type vetor = array [15] of integer; result :== m / 2 nota1 : real; nota2 : real; end;')
 
 while True:
     tok = lexer.token()
