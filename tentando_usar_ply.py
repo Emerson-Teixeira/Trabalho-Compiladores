@@ -1,6 +1,6 @@
 import ply.lex as lex
 
-tokens = ( 'INTEIRO', 'REAL', 'IDENTIFICADOR', 'OPERADOR_MAT' )
+tokens = ( 'INTEIRO', 'REAL', 'IDENTIFICADOR', 'OPERADOR_MAT', 'SPECIAL_CHARACTERS')
 
 def t_REAL(t):
     r'\d+\.\d+' #Nesse caso será aceito 1.5 mas não 1. nem .5
@@ -19,14 +19,18 @@ def t_IDENTIFICADOR(t):
 
 def t_OPERADOR_MAT(t):
     r'\+|-|\*|/'
-    print( "O toke " + t.value + " é um operador matemático" )
+    print( "O token " + t.value + " é um operador matemático" )
     return t
 
-t_ignore = ' '
+def t_error(t):
+     print("Não é possivel identificar o caractere: '%s'" % t.value[0])
+     t.lexer.skip(1)
+
+t_ignore = ' \t'
 
 lexer = lex.lex()
 
-lexer.input(' identificatorator 96 95.0 + algo - * /    ')
+lexer.input(' identificatorator 96 95.0 + algo - * . /')
 
 while True:
     tok = lexer.token()
