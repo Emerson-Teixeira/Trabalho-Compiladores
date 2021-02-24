@@ -20,9 +20,9 @@ reservado = {
     'of':'OF',
 }
 
-tokens = ['NUMERO', 'ID', 'OP_MAT', 'OP_LOGICO','ATRIBUICAO'] + list(reservado.values())
+tokens = ['NUMERO', 'ID', 'OP_MAT', 'OP_LOGICO','ATRIBUICAO','CONST_VALOR'] + list(reservado.values())
 
-literals = ";.,[]():\" \'"
+literals = ";.,[]():"
 
 def t_NUMERO(t):
     r'(\d+\.\d+)|(\d+)' #Nesse caso será aceito 1.5 mas não 1. nem .5
@@ -49,11 +49,15 @@ def t_ATRIBUICAO(t):
     r'\:='
     return t
 
+def t_CONST_VALOR(t):
+    r'\"[a-zA-Z0-9]*\"'
+    return t
+
 t_ignore = ' \t \n'
 
 lexer = lex.lex()
 
-lexer.input('const TAM = 10; type vetor = array [15] of integer; result :== m / 2 nota1 : real; nota2 : real; end;')
+lexer.input('"asdasdasd"')
 
 while True:
     tok = lexer.token()
