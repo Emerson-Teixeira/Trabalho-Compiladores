@@ -57,6 +57,11 @@ t_ignore = ' \t \n'
 
 lexer = lex.lex()
 
+"""
+### Para debugar:
+
+""
+
 lexer.input('"asdasdasd"')
 
 while True:
@@ -64,3 +69,5 @@ while True:
     if not tok: 
         break
     print(tok.type)      # No more input
+
+"""
