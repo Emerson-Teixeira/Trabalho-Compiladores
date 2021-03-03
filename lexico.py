@@ -53,7 +53,7 @@ t_ignore = ' \t \n'
 
 lexer = lex.lex()
 
-
+"""
 ### Para debugar:
 
 lexer.input('''const TAM = 10;
@@ -134,3 +134,4 @@ while True:
         break
     print(tok.type)      # No more input
 
+"""
