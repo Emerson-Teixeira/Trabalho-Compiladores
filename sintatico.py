@@ -113,20 +113,29 @@ def p_else(p):
     print('else reconhecido')
 
 def p_lista_param(p):
-    '''lista_param : parametro ',' lista_nome
-                   | parametro
+    '''lista_param : parametro lista_param_aux
                    | ''' # empty rule
     print('lista_param reconhecido')
 
+def p_lista_param_aux(p):
+    '''lista_param_aux : ',' lista_param
+                       | ''' # empty rule
+
 def p_exp_logica(p):
-    '''exp_logica : exp_mat OP_LOGICO exp_logica
-                  | exp_mat'''
+    '''exp_logica : exp_mat exp_logica_aux'''
     print('exp_logica reconhecida')
 
+def p_exp_logica_aux(p):
+    '''exp_logica_aux : OP_LOGICO exp_logica
+                      | ''' # empty rule
+
 def p_exp_mat(p):
-    '''exp_mat : parametro OP_MAT exp_mat
-               | parametro'''
+    '''exp_mat : parametro exp_mat_aux'''
     print('exp_mat reconhecido')
+
+def p_exp_mat_aux(p):
+    '''exp_mat_aux : OP_MAT exp_mat
+                   | ''' # empty rule
 
 def p_parametro(p):
     '''parametro : ID nome
@@ -139,12 +148,6 @@ def p_nome(p):
             | '(' lista_param ')'
             | ''' # empty rule
     print('nome reconhecido')
-
-def p_lista_nome(p):
-    '''lista_nome : nome ',' lista_nome
-                  | nome
-                  | ''' # empty rule
-    print('lista_nome reconhecido')
     
 def p_error(p):
     print("Erro de sintax")
