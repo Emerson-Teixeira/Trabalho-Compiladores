@@ -96,7 +96,7 @@ def p_lista_com(p):
 
 def p_bloco(p):
     '''bloco : BEGIN comando lista_com END
-             | empty''' # empty rule
+             | comando''' # empty rule
     print("Bloco reconhecido")
 
 def p_comando(p):
@@ -161,9 +161,9 @@ def p_empty(p):
      pass
 
 def p_error(p):
-    print("################Erro de sintax######################")
+    print("\n\n\n\n\################Erro de sintax######################\n\n\n\n\n\n\n\n\n\n\n")
 
-parser = yacc.yacc(debug = True)
+parser = yacc.yacc()
 
 print(parser.parse('''
 const TAM = 10;
@@ -237,7 +237,7 @@ C := exp(A,B);
 D := media(E);
 F := lerDados()
 end
-'''))
+''', debug=True))
 
 """
 while True:
