@@ -82,7 +82,8 @@ def p_nome_funcao(p):
     print('Nome_funcao reconhecido')
 
 def p_param_func(p):
-    '''param_func : '(' campos ')' '''
+    '''param_func : '(' campos ')'
+                  |  '''
     print('param_func reconhecido')
 
 def p_bloco_funcao(p):
@@ -100,11 +101,11 @@ def p_bloco(p):
     print("Bloco reconhecido")
 
 def p_comando(p):
-    '''comando : nome ATRIBUICAO exp_mat
+    '''comando : ID nome ATRIBUICAO exp_mat
                | WHILE exp_logica bloco
                | IF exp_logica THEN bloco else
                | WRITE const_valor
-               | READ nome'''
+               | READ ID nome'''
     print('comando reconhecido')
 
 def p_else(p):
@@ -237,7 +238,7 @@ C := exp(A,B);
 D := media(E);
 F := lerDados()
 end
-''', debug=True))
+'''))
 
 """
 while True:
