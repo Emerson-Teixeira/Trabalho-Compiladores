@@ -61,7 +61,7 @@ def p_campos(p):
     print("campos reconhecido")
 
 def p_lista_campos(p):
-    '''lista_campos : ';' campos lista_campos
+    '''lista_campos : ';' campos
                     | empty ''' #empty rule
     print("lista_campos reconhecido")
     
