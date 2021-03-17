@@ -162,7 +162,8 @@ def p_empty(p):
      pass
 
 def p_error(p):
-    print("\n\n\n\n\################Erro de sintax######################\n\n\n\n\n\n\n\n\n\n\n")
+    print("\n\nERRO NA LINHA: ", p.lineno, "!!!!!")
+    print("\n\nTOKEN COM ERRO: ", p.value, "!!!!!\n\n")
 
 parser = yacc.yacc()
 
