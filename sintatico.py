@@ -172,12 +172,15 @@ def p_error(p):
  
     while True:
         tok = parser.token() # Get the next token
+        
         if not tok: 
             break
         elif tok.type == 'END':
             return tok
         elif tok.type == ';':
+            print("\npulou!!!! : ", tok.type, tok.value, "\n")
             parser.errok()
+        print("\npulou!!!! : ", tok.type, tok.value, "\n")
 
 parser = yacc.yacc()
 
@@ -188,12 +191,12 @@ type aluno = record
 nota1 : real;
 nota2 : real
 end;
-var A, B, C, D : integer
+var A, B, C, D : integer;
 var E : vetor;
 var F : aluno;
 function fatorial(a:integer) : integer
 var i : integer;
-begin
+
 i := 1;
 result:=1;
 while i < a
@@ -253,7 +256,7 @@ C := exp(A,B);
 D := media(E);
 F := lerDados()
 end
-''',debug = True))
+'''))
 
 """
 while True:
