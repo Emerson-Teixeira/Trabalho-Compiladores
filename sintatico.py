@@ -163,7 +163,21 @@ def p_empty(p):
 
 def p_error(p):
     print("\n\nERRO NA LINHA: ", p.lineno, "!!!!!")
-    print("\n\nTOKEN COM ERRO: ", p.value, "!!!!!\n\n")
+    print("TOKEN COM ERRO: ", p.value, "!!!!!")
+    print("TIPO DO TOKEN: ", p.type, "!!!!!!\n\n")
+
+    if not p:
+        print("End of File!")
+        return
+ 
+    while True:
+        tok = parser.token() # Get the next token
+        if not tok: 
+            break
+        elif tok.type == 'END':
+            return tok
+        elif tok.type == ';':
+            parser.errok()
 
 parser = yacc.yacc()
 
@@ -174,7 +188,7 @@ type aluno = record
 nota1 : real;
 nota2 : real
 end;
-var A, B, C, D : integer;
+var A, B, C, D : integer
 var E : vetor;
 var F : aluno;
 function fatorial(a:integer) : integer
@@ -239,7 +253,7 @@ C := exp(A,B);
 D := media(E);
 F := lerDados()
 end
-'''))
+''',debug = True))
 
 """
 while True:

@@ -1,0 +1,1868 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> programa
+Rule 1     programa -> declaracoes principal
+Rule 2     principal -> BEGIN comando lista_com END
+Rule 3     declaracoes -> def_const def_tipos def_var def_func
+Rule 4     def_const -> constante def_const
+Rule 5     def_const -> empty
+Rule 6     def_tipos -> tipo def_tipos
+Rule 7     def_tipos -> empty
+Rule 8     def_var -> variavel def_var
+Rule 9     def_var -> empty
+Rule 10    def_func -> funcao def_func
+Rule 11    def_func -> empty
+Rule 12    constante -> CONST ID = const_valor ;
+Rule 13    const_valor -> CONST_VALOR
+Rule 14    const_valor -> exp_mat
+Rule 15    tipo -> TYPE ID = tipo_dado ;
+Rule 16    variavel -> VAR ID lista_id : tipo_dado ;
+Rule 17    lista_id -> , ID lista_id
+Rule 18    lista_id -> empty
+Rule 19    campos -> ID : tipo_dado lista_campos
+Rule 20    lista_campos -> ; campos
+Rule 21    lista_campos -> empty
+Rule 22    tipo_dado -> INTEGER
+Rule 23    tipo_dado -> REAL
+Rule 24    tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado
+Rule 25    tipo_dado -> RECORD campos END
+Rule 26    tipo_dado -> ID
+Rule 27    funcao -> FUNCTION nome_funcao bloco_funcao
+Rule 28    nome_funcao -> ID param_func : tipo_dado
+Rule 29    param_func -> ( campos )
+Rule 30    param_func -> <empty>
+Rule 31    bloco_funcao -> def_var BEGIN comando lista_com END
+Rule 32    lista_com -> ; comando lista_com
+Rule 33    lista_com -> empty
+Rule 34    bloco -> BEGIN comando lista_com END
+Rule 35    bloco -> comando
+Rule 36    comando -> ID nome ATRIBUICAO exp_mat
+Rule 37    comando -> WHILE exp_logica bloco
+Rule 38    comando -> IF exp_logica THEN bloco else
+Rule 39    comando -> WRITE const_valor
+Rule 40    comando -> READ ID nome
+Rule 41    else -> ELSE bloco
+Rule 42    else -> empty
+Rule 43    lista_param -> parametro lista_param_aux
+Rule 44    lista_param -> empty
+Rule 45    lista_param_aux -> , lista_param
+Rule 46    lista_param_aux -> empty
+Rule 47    exp_logica -> exp_mat exp_logica_aux
+Rule 48    exp_logica_aux -> op_logico exp_logica
+Rule 49    exp_logica_aux -> empty
+Rule 50    exp_mat -> parametro exp_mat_aux
+Rule 51    exp_mat_aux -> OP_MAT exp_mat
+Rule 52    exp_mat_aux -> empty
+Rule 53    parametro -> ID nome
+Rule 54    parametro -> NUMERO
+Rule 55    op_logico -> <
+Rule 56    op_logico -> >
+Rule 57    op_logico -> =
+Rule 58    op_logico -> !
+Rule 59    nome -> . ID nome
+Rule 60    nome -> [ parametro ]
+Rule 61    nome -> ( lista_param )
+Rule 62    nome -> empty
+Rule 63    empty -> <empty>
+
+Terminals, with rules where they appear
+
+!                    : 58
+(                    : 29 61
+)                    : 29 61
+,                    : 17 45
+.                    : 59
+:                    : 16 19 28
+;                    : 12 15 16 20 32
+<                    : 55
+=                    : 12 15 57
+>                    : 56
+ARRAY                : 24
+ATRIBUICAO           : 36
+BEGIN                : 2 31 34
+CONST                : 12
+CONST_VALOR          : 13
+ELSE                 : 41
+END                  : 2 25 31 34
+FUNCTION             : 27
+ID                   : 12 15 16 17 19 26 28 36 40 53 59
+IF                   : 38
+INTEGER              : 22
+NUMERO               : 24 54
+OF                   : 24
+OP_MAT               : 51
+READ                 : 40
+REAL                 : 23
+RECORD               : 25
+THEN                 : 38
+TYPE                 : 15
+VAR                  : 16
+WHILE                : 37
+WRITE                : 39
+[                    : 24 60
+]                    : 24 60
+error                : 
+
+Nonterminals, with rules where they appear
+
+bloco                : 37 38 41
+bloco_funcao         : 27
+campos               : 20 25 29
+comando              : 2 31 32 34 35
+const_valor          : 12 39
+constante            : 4
+declaracoes          : 1
+def_const            : 3 4
+def_func             : 3 10
+def_tipos            : 3 6
+def_var              : 3 8 31
+else                 : 38
+empty                : 5 7 9 11 18 21 33 42 44 46 49 52 62
+exp_logica           : 37 38 48
+exp_logica_aux       : 47
+exp_mat              : 14 36 47 51
+exp_mat_aux          : 50
+funcao               : 10
+lista_campos         : 19
+lista_com            : 2 31 32 34
+lista_id             : 16 17
+lista_param          : 45 61
+lista_param_aux      : 43
+nome                 : 36 40 53 59
+nome_funcao          : 27
+op_logico            : 48
+param_func           : 28
+parametro            : 43 50 60
+principal            : 1
+programa             : 0
+tipo                 : 6
+tipo_dado            : 15 16 19 24 28
+variavel             : 8
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . programa
+    (1) programa -> . declaracoes principal
+    (3) declaracoes -> . def_const def_tipos def_var def_func
+    (4) def_const -> . constante def_const
+    (5) def_const -> . empty
+    (12) constante -> . CONST ID = const_valor ;
+    (63) empty -> .
+
+    CONST           shift and go to state 6
+    TYPE            reduce using rule 63 (empty -> .)
+    VAR             reduce using rule 63 (empty -> .)
+    FUNCTION        reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    programa                       shift and go to state 1
+    declaracoes                    shift and go to state 2
+    def_const                      shift and go to state 3
+    constante                      shift and go to state 4
+    empty                          shift and go to state 5
+
+state 1
+
+    (0) S' -> programa .
+
+
+
+state 2
+
+    (1) programa -> declaracoes . principal
+    (2) principal -> . BEGIN comando lista_com END
+
+    BEGIN           shift and go to state 8
+
+    principal                      shift and go to state 7
+
+state 3
+
+    (3) declaracoes -> def_const . def_tipos def_var def_func
+    (6) def_tipos -> . tipo def_tipos
+    (7) def_tipos -> . empty
+    (15) tipo -> . TYPE ID = tipo_dado ;
+    (63) empty -> .
+
+    TYPE            shift and go to state 12
+    VAR             reduce using rule 63 (empty -> .)
+    FUNCTION        reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    def_tipos                      shift and go to state 9
+    tipo                           shift and go to state 10
+    empty                          shift and go to state 11
+
+state 4
+
+    (4) def_const -> constante . def_const
+    (4) def_const -> . constante def_const
+    (5) def_const -> . empty
+    (12) constante -> . CONST ID = const_valor ;
+    (63) empty -> .
+
+    CONST           shift and go to state 6
+    TYPE            reduce using rule 63 (empty -> .)
+    VAR             reduce using rule 63 (empty -> .)
+    FUNCTION        reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    constante                      shift and go to state 4
+    def_const                      shift and go to state 13
+    empty                          shift and go to state 5
+
+state 5
+
+    (5) def_const -> empty .
+
+    TYPE            reduce using rule 5 (def_const -> empty .)
+    VAR             reduce using rule 5 (def_const -> empty .)
+    FUNCTION        reduce using rule 5 (def_const -> empty .)
+    BEGIN           reduce using rule 5 (def_const -> empty .)
+
+
+state 6
+
+    (12) constante -> CONST . ID = const_valor ;
+
+    ID              shift and go to state 14
+
+
+state 7
+
+    (1) programa -> declaracoes principal .
+
+    $end            reduce using rule 1 (programa -> declaracoes principal .)
+
+
+state 8
+
+    (2) principal -> BEGIN . comando lista_com END
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    comando                        shift and go to state 15
+
+state 9
+
+    (3) declaracoes -> def_const def_tipos . def_var def_func
+    (8) def_var -> . variavel def_var
+    (9) def_var -> . empty
+    (16) variavel -> . VAR ID lista_id : tipo_dado ;
+    (63) empty -> .
+
+    VAR             shift and go to state 24
+    FUNCTION        reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    def_var                        shift and go to state 21
+    variavel                       shift and go to state 22
+    empty                          shift and go to state 23
+
+state 10
+
+    (6) def_tipos -> tipo . def_tipos
+    (6) def_tipos -> . tipo def_tipos
+    (7) def_tipos -> . empty
+    (15) tipo -> . TYPE ID = tipo_dado ;
+    (63) empty -> .
+
+    TYPE            shift and go to state 12
+    VAR             reduce using rule 63 (empty -> .)
+    FUNCTION        reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    tipo                           shift and go to state 10
+    def_tipos                      shift and go to state 25
+    empty                          shift and go to state 11
+
+state 11
+
+    (7) def_tipos -> empty .
+
+    VAR             reduce using rule 7 (def_tipos -> empty .)
+    FUNCTION        reduce using rule 7 (def_tipos -> empty .)
+    BEGIN           reduce using rule 7 (def_tipos -> empty .)
+
+
+state 12
+
+    (15) tipo -> TYPE . ID = tipo_dado ;
+
+    ID              shift and go to state 26
+
+
+state 13
+
+    (4) def_const -> constante def_const .
+
+    TYPE            reduce using rule 4 (def_const -> constante def_const .)
+    VAR             reduce using rule 4 (def_const -> constante def_const .)
+    FUNCTION        reduce using rule 4 (def_const -> constante def_const .)
+    BEGIN           reduce using rule 4 (def_const -> constante def_const .)
+
+
+state 14
+
+    (12) constante -> CONST ID . = const_valor ;
+
+    =               shift and go to state 27
+
+
+state 15
+
+    (2) principal -> BEGIN comando . lista_com END
+    (32) lista_com -> . ; comando lista_com
+    (33) lista_com -> . empty
+    (63) empty -> .
+
+    ;               shift and go to state 29
+    END             reduce using rule 63 (empty -> .)
+
+    lista_com                      shift and go to state 28
+    empty                          shift and go to state 30
+
+state 16
+
+    (36) comando -> ID . nome ATRIBUICAO exp_mat
+    (59) nome -> . . ID nome
+    (60) nome -> . [ parametro ]
+    (61) nome -> . ( lista_param )
+    (62) nome -> . empty
+    (63) empty -> .
+
+    .               shift and go to state 32
+    [               shift and go to state 33
+    (               shift and go to state 34
+    ATRIBUICAO      reduce using rule 63 (empty -> .)
+
+    nome                           shift and go to state 31
+    empty                          shift and go to state 35
+
+state 17
+
+    (37) comando -> WHILE . exp_logica bloco
+    (47) exp_logica -> . exp_mat exp_logica_aux
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    exp_logica                     shift and go to state 36
+    exp_mat                        shift and go to state 37
+    parametro                      shift and go to state 38
+
+state 18
+
+    (38) comando -> IF . exp_logica THEN bloco else
+    (47) exp_logica -> . exp_mat exp_logica_aux
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    exp_logica                     shift and go to state 41
+    exp_mat                        shift and go to state 37
+    parametro                      shift and go to state 38
+
+state 19
+
+    (39) comando -> WRITE . const_valor
+    (13) const_valor -> . CONST_VALOR
+    (14) const_valor -> . exp_mat
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    CONST_VALOR     shift and go to state 43
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    const_valor                    shift and go to state 42
+    exp_mat                        shift and go to state 44
+    parametro                      shift and go to state 38
+
+state 20
+
+    (40) comando -> READ . ID nome
+
+    ID              shift and go to state 45
+
+
+state 21
+
+    (3) declaracoes -> def_const def_tipos def_var . def_func
+    (10) def_func -> . funcao def_func
+    (11) def_func -> . empty
+    (27) funcao -> . FUNCTION nome_funcao bloco_funcao
+    (63) empty -> .
+
+    FUNCTION        shift and go to state 49
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    def_func                       shift and go to state 46
+    funcao                         shift and go to state 47
+    empty                          shift and go to state 48
+
+state 22
+
+    (8) def_var -> variavel . def_var
+    (8) def_var -> . variavel def_var
+    (9) def_var -> . empty
+    (16) variavel -> . VAR ID lista_id : tipo_dado ;
+    (63) empty -> .
+
+    VAR             shift and go to state 24
+    FUNCTION        reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    variavel                       shift and go to state 22
+    def_var                        shift and go to state 50
+    empty                          shift and go to state 23
+
+state 23
+
+    (9) def_var -> empty .
+
+    FUNCTION        reduce using rule 9 (def_var -> empty .)
+    BEGIN           reduce using rule 9 (def_var -> empty .)
+
+
+state 24
+
+    (16) variavel -> VAR . ID lista_id : tipo_dado ;
+
+    ID              shift and go to state 51
+
+
+state 25
+
+    (6) def_tipos -> tipo def_tipos .
+
+    VAR             reduce using rule 6 (def_tipos -> tipo def_tipos .)
+    FUNCTION        reduce using rule 6 (def_tipos -> tipo def_tipos .)
+    BEGIN           reduce using rule 6 (def_tipos -> tipo def_tipos .)
+
+
+state 26
+
+    (15) tipo -> TYPE ID . = tipo_dado ;
+
+    =               shift and go to state 52
+
+
+state 27
+
+    (12) constante -> CONST ID = . const_valor ;
+    (13) const_valor -> . CONST_VALOR
+    (14) const_valor -> . exp_mat
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    CONST_VALOR     shift and go to state 43
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    const_valor                    shift and go to state 53
+    exp_mat                        shift and go to state 44
+    parametro                      shift and go to state 38
+
+state 28
+
+    (2) principal -> BEGIN comando lista_com . END
+
+    END             shift and go to state 54
+
+
+state 29
+
+    (32) lista_com -> ; . comando lista_com
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    comando                        shift and go to state 55
+
+state 30
+
+    (33) lista_com -> empty .
+
+    END             reduce using rule 33 (lista_com -> empty .)
+
+
+state 31
+
+    (36) comando -> ID nome . ATRIBUICAO exp_mat
+
+    ATRIBUICAO      shift and go to state 56
+
+
+state 32
+
+    (59) nome -> . . ID nome
+
+    ID              shift and go to state 57
+
+
+state 33
+
+    (60) nome -> [ . parametro ]
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    parametro                      shift and go to state 58
+
+state 34
+
+    (61) nome -> ( . lista_param )
+    (43) lista_param -> . parametro lista_param_aux
+    (44) lista_param -> . empty
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+    (63) empty -> .
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+    )               reduce using rule 63 (empty -> .)
+
+    lista_param                    shift and go to state 59
+    parametro                      shift and go to state 60
+    empty                          shift and go to state 61
+
+state 35
+
+    (62) nome -> empty .
+
+    ATRIBUICAO      reduce using rule 62 (nome -> empty .)
+    OP_MAT          reduce using rule 62 (nome -> empty .)
+    <               reduce using rule 62 (nome -> empty .)
+    >               reduce using rule 62 (nome -> empty .)
+    =               reduce using rule 62 (nome -> empty .)
+    !               reduce using rule 62 (nome -> empty .)
+    BEGIN           reduce using rule 62 (nome -> empty .)
+    ID              reduce using rule 62 (nome -> empty .)
+    WHILE           reduce using rule 62 (nome -> empty .)
+    IF              reduce using rule 62 (nome -> empty .)
+    WRITE           reduce using rule 62 (nome -> empty .)
+    READ            reduce using rule 62 (nome -> empty .)
+    THEN            reduce using rule 62 (nome -> empty .)
+    ;               reduce using rule 62 (nome -> empty .)
+    END             reduce using rule 62 (nome -> empty .)
+    ELSE            reduce using rule 62 (nome -> empty .)
+    ]               reduce using rule 62 (nome -> empty .)
+    ,               reduce using rule 62 (nome -> empty .)
+    )               reduce using rule 62 (nome -> empty .)
+
+
+state 36
+
+    (37) comando -> WHILE exp_logica . bloco
+    (34) bloco -> . BEGIN comando lista_com END
+    (35) bloco -> . comando
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    BEGIN           shift and go to state 63
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    bloco                          shift and go to state 62
+    comando                        shift and go to state 64
+
+state 37
+
+    (47) exp_logica -> exp_mat . exp_logica_aux
+    (48) exp_logica_aux -> . op_logico exp_logica
+    (49) exp_logica_aux -> . empty
+    (55) op_logico -> . <
+    (56) op_logico -> . >
+    (57) op_logico -> . =
+    (58) op_logico -> . !
+    (63) empty -> .
+
+    <               shift and go to state 68
+    >               shift and go to state 69
+    =               shift and go to state 70
+    !               shift and go to state 71
+    BEGIN           reduce using rule 63 (empty -> .)
+    ID              reduce using rule 63 (empty -> .)
+    WHILE           reduce using rule 63 (empty -> .)
+    IF              reduce using rule 63 (empty -> .)
+    WRITE           reduce using rule 63 (empty -> .)
+    READ            reduce using rule 63 (empty -> .)
+    THEN            reduce using rule 63 (empty -> .)
+
+    exp_logica_aux                 shift and go to state 65
+    op_logico                      shift and go to state 66
+    empty                          shift and go to state 67
+
+state 38
+
+    (50) exp_mat -> parametro . exp_mat_aux
+    (51) exp_mat_aux -> . OP_MAT exp_mat
+    (52) exp_mat_aux -> . empty
+    (63) empty -> .
+
+    OP_MAT          shift and go to state 73
+    <               reduce using rule 63 (empty -> .)
+    >               reduce using rule 63 (empty -> .)
+    =               reduce using rule 63 (empty -> .)
+    !               reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+    ID              reduce using rule 63 (empty -> .)
+    WHILE           reduce using rule 63 (empty -> .)
+    IF              reduce using rule 63 (empty -> .)
+    WRITE           reduce using rule 63 (empty -> .)
+    READ            reduce using rule 63 (empty -> .)
+    THEN            reduce using rule 63 (empty -> .)
+    ;               reduce using rule 63 (empty -> .)
+    END             reduce using rule 63 (empty -> .)
+    ELSE            reduce using rule 63 (empty -> .)
+
+    exp_mat_aux                    shift and go to state 72
+    empty                          shift and go to state 74
+
+state 39
+
+    (53) parametro -> ID . nome
+    (59) nome -> . . ID nome
+    (60) nome -> . [ parametro ]
+    (61) nome -> . ( lista_param )
+    (62) nome -> . empty
+    (63) empty -> .
+
+    .               shift and go to state 32
+    [               shift and go to state 33
+    (               shift and go to state 34
+    OP_MAT          reduce using rule 63 (empty -> .)
+    <               reduce using rule 63 (empty -> .)
+    >               reduce using rule 63 (empty -> .)
+    =               reduce using rule 63 (empty -> .)
+    !               reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+    ID              reduce using rule 63 (empty -> .)
+    WHILE           reduce using rule 63 (empty -> .)
+    IF              reduce using rule 63 (empty -> .)
+    WRITE           reduce using rule 63 (empty -> .)
+    READ            reduce using rule 63 (empty -> .)
+    THEN            reduce using rule 63 (empty -> .)
+    ;               reduce using rule 63 (empty -> .)
+    END             reduce using rule 63 (empty -> .)
+    ELSE            reduce using rule 63 (empty -> .)
+    ]               reduce using rule 63 (empty -> .)
+    ,               reduce using rule 63 (empty -> .)
+    )               reduce using rule 63 (empty -> .)
+
+    nome                           shift and go to state 75
+    empty                          shift and go to state 35
+
+state 40
+
+    (54) parametro -> NUMERO .
+
+    OP_MAT          reduce using rule 54 (parametro -> NUMERO .)
+    <               reduce using rule 54 (parametro -> NUMERO .)
+    >               reduce using rule 54 (parametro -> NUMERO .)
+    =               reduce using rule 54 (parametro -> NUMERO .)
+    !               reduce using rule 54 (parametro -> NUMERO .)
+    BEGIN           reduce using rule 54 (parametro -> NUMERO .)
+    ID              reduce using rule 54 (parametro -> NUMERO .)
+    WHILE           reduce using rule 54 (parametro -> NUMERO .)
+    IF              reduce using rule 54 (parametro -> NUMERO .)
+    WRITE           reduce using rule 54 (parametro -> NUMERO .)
+    READ            reduce using rule 54 (parametro -> NUMERO .)
+    THEN            reduce using rule 54 (parametro -> NUMERO .)
+    ;               reduce using rule 54 (parametro -> NUMERO .)
+    END             reduce using rule 54 (parametro -> NUMERO .)
+    ELSE            reduce using rule 54 (parametro -> NUMERO .)
+    ]               reduce using rule 54 (parametro -> NUMERO .)
+    ,               reduce using rule 54 (parametro -> NUMERO .)
+    )               reduce using rule 54 (parametro -> NUMERO .)
+
+
+state 41
+
+    (38) comando -> IF exp_logica . THEN bloco else
+
+    THEN            shift and go to state 76
+
+
+state 42
+
+    (39) comando -> WRITE const_valor .
+
+    ;               reduce using rule 39 (comando -> WRITE const_valor .)
+    END             reduce using rule 39 (comando -> WRITE const_valor .)
+    ELSE            reduce using rule 39 (comando -> WRITE const_valor .)
+
+
+state 43
+
+    (13) const_valor -> CONST_VALOR .
+
+    ;               reduce using rule 13 (const_valor -> CONST_VALOR .)
+    END             reduce using rule 13 (const_valor -> CONST_VALOR .)
+    ELSE            reduce using rule 13 (const_valor -> CONST_VALOR .)
+
+
+state 44
+
+    (14) const_valor -> exp_mat .
+
+    ;               reduce using rule 14 (const_valor -> exp_mat .)
+    END             reduce using rule 14 (const_valor -> exp_mat .)
+    ELSE            reduce using rule 14 (const_valor -> exp_mat .)
+
+
+state 45
+
+    (40) comando -> READ ID . nome
+    (59) nome -> . . ID nome
+    (60) nome -> . [ parametro ]
+    (61) nome -> . ( lista_param )
+    (62) nome -> . empty
+    (63) empty -> .
+
+    .               shift and go to state 32
+    [               shift and go to state 33
+    (               shift and go to state 34
+    ;               reduce using rule 63 (empty -> .)
+    END             reduce using rule 63 (empty -> .)
+    ELSE            reduce using rule 63 (empty -> .)
+
+    nome                           shift and go to state 77
+    empty                          shift and go to state 35
+
+state 46
+
+    (3) declaracoes -> def_const def_tipos def_var def_func .
+
+    BEGIN           reduce using rule 3 (declaracoes -> def_const def_tipos def_var def_func .)
+
+
+state 47
+
+    (10) def_func -> funcao . def_func
+    (10) def_func -> . funcao def_func
+    (11) def_func -> . empty
+    (27) funcao -> . FUNCTION nome_funcao bloco_funcao
+    (63) empty -> .
+
+    FUNCTION        shift and go to state 49
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    funcao                         shift and go to state 47
+    def_func                       shift and go to state 78
+    empty                          shift and go to state 48
+
+state 48
+
+    (11) def_func -> empty .
+
+    BEGIN           reduce using rule 11 (def_func -> empty .)
+
+
+state 49
+
+    (27) funcao -> FUNCTION . nome_funcao bloco_funcao
+    (28) nome_funcao -> . ID param_func : tipo_dado
+
+    ID              shift and go to state 80
+
+    nome_funcao                    shift and go to state 79
+
+state 50
+
+    (8) def_var -> variavel def_var .
+
+    FUNCTION        reduce using rule 8 (def_var -> variavel def_var .)
+    BEGIN           reduce using rule 8 (def_var -> variavel def_var .)
+
+
+state 51
+
+    (16) variavel -> VAR ID . lista_id : tipo_dado ;
+    (17) lista_id -> . , ID lista_id
+    (18) lista_id -> . empty
+    (63) empty -> .
+
+    ,               shift and go to state 82
+    :               reduce using rule 63 (empty -> .)
+
+    lista_id                       shift and go to state 81
+    empty                          shift and go to state 83
+
+state 52
+
+    (15) tipo -> TYPE ID = . tipo_dado ;
+    (22) tipo_dado -> . INTEGER
+    (23) tipo_dado -> . REAL
+    (24) tipo_dado -> . ARRAY [ NUMERO ] OF tipo_dado
+    (25) tipo_dado -> . RECORD campos END
+    (26) tipo_dado -> . ID
+
+    INTEGER         shift and go to state 86
+    REAL            shift and go to state 87
+    ARRAY           shift and go to state 88
+    RECORD          shift and go to state 89
+    ID              shift and go to state 84
+
+    tipo_dado                      shift and go to state 85
+
+state 53
+
+    (12) constante -> CONST ID = const_valor . ;
+
+    ;               shift and go to state 90
+
+
+state 54
+
+    (2) principal -> BEGIN comando lista_com END .
+
+    $end            reduce using rule 2 (principal -> BEGIN comando lista_com END .)
+
+
+state 55
+
+    (32) lista_com -> ; comando . lista_com
+    (32) lista_com -> . ; comando lista_com
+    (33) lista_com -> . empty
+    (63) empty -> .
+
+    ;               shift and go to state 29
+    END             reduce using rule 63 (empty -> .)
+
+    lista_com                      shift and go to state 91
+    empty                          shift and go to state 30
+
+state 56
+
+    (36) comando -> ID nome ATRIBUICAO . exp_mat
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    exp_mat                        shift and go to state 92
+    parametro                      shift and go to state 38
+
+state 57
+
+    (59) nome -> . ID . nome
+    (59) nome -> . . ID nome
+    (60) nome -> . [ parametro ]
+    (61) nome -> . ( lista_param )
+    (62) nome -> . empty
+    (63) empty -> .
+
+    .               shift and go to state 32
+    [               shift and go to state 33
+    (               shift and go to state 34
+    ATRIBUICAO      reduce using rule 63 (empty -> .)
+    OP_MAT          reduce using rule 63 (empty -> .)
+    <               reduce using rule 63 (empty -> .)
+    >               reduce using rule 63 (empty -> .)
+    =               reduce using rule 63 (empty -> .)
+    !               reduce using rule 63 (empty -> .)
+    BEGIN           reduce using rule 63 (empty -> .)
+    ID              reduce using rule 63 (empty -> .)
+    WHILE           reduce using rule 63 (empty -> .)
+    IF              reduce using rule 63 (empty -> .)
+    WRITE           reduce using rule 63 (empty -> .)
+    READ            reduce using rule 63 (empty -> .)
+    THEN            reduce using rule 63 (empty -> .)
+    ;               reduce using rule 63 (empty -> .)
+    END             reduce using rule 63 (empty -> .)
+    ELSE            reduce using rule 63 (empty -> .)
+    ]               reduce using rule 63 (empty -> .)
+    ,               reduce using rule 63 (empty -> .)
+    )               reduce using rule 63 (empty -> .)
+
+    nome                           shift and go to state 93
+    empty                          shift and go to state 35
+
+state 58
+
+    (60) nome -> [ parametro . ]
+
+    ]               shift and go to state 94
+
+
+state 59
+
+    (61) nome -> ( lista_param . )
+
+    )               shift and go to state 95
+
+
+state 60
+
+    (43) lista_param -> parametro . lista_param_aux
+    (45) lista_param_aux -> . , lista_param
+    (46) lista_param_aux -> . empty
+    (63) empty -> .
+
+    ,               shift and go to state 97
+    )               reduce using rule 63 (empty -> .)
+
+    lista_param_aux                shift and go to state 96
+    empty                          shift and go to state 98
+
+state 61
+
+    (44) lista_param -> empty .
+
+    )               reduce using rule 44 (lista_param -> empty .)
+
+
+state 62
+
+    (37) comando -> WHILE exp_logica bloco .
+
+    ;               reduce using rule 37 (comando -> WHILE exp_logica bloco .)
+    END             reduce using rule 37 (comando -> WHILE exp_logica bloco .)
+    ELSE            reduce using rule 37 (comando -> WHILE exp_logica bloco .)
+
+
+state 63
+
+    (34) bloco -> BEGIN . comando lista_com END
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    comando                        shift and go to state 99
+
+state 64
+
+    (35) bloco -> comando .
+
+    ;               reduce using rule 35 (bloco -> comando .)
+    END             reduce using rule 35 (bloco -> comando .)
+    ELSE            reduce using rule 35 (bloco -> comando .)
+
+
+state 65
+
+    (47) exp_logica -> exp_mat exp_logica_aux .
+
+    BEGIN           reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+    ID              reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+    WHILE           reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+    IF              reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+    WRITE           reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+    READ            reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+    THEN            reduce using rule 47 (exp_logica -> exp_mat exp_logica_aux .)
+
+
+state 66
+
+    (48) exp_logica_aux -> op_logico . exp_logica
+    (47) exp_logica -> . exp_mat exp_logica_aux
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    exp_logica                     shift and go to state 100
+    exp_mat                        shift and go to state 37
+    parametro                      shift and go to state 38
+
+state 67
+
+    (49) exp_logica_aux -> empty .
+
+    BEGIN           reduce using rule 49 (exp_logica_aux -> empty .)
+    ID              reduce using rule 49 (exp_logica_aux -> empty .)
+    WHILE           reduce using rule 49 (exp_logica_aux -> empty .)
+    IF              reduce using rule 49 (exp_logica_aux -> empty .)
+    WRITE           reduce using rule 49 (exp_logica_aux -> empty .)
+    READ            reduce using rule 49 (exp_logica_aux -> empty .)
+    THEN            reduce using rule 49 (exp_logica_aux -> empty .)
+
+
+state 68
+
+    (55) op_logico -> < .
+
+    ID              reduce using rule 55 (op_logico -> < .)
+    NUMERO          reduce using rule 55 (op_logico -> < .)
+
+
+state 69
+
+    (56) op_logico -> > .
+
+    ID              reduce using rule 56 (op_logico -> > .)
+    NUMERO          reduce using rule 56 (op_logico -> > .)
+
+
+state 70
+
+    (57) op_logico -> = .
+
+    ID              reduce using rule 57 (op_logico -> = .)
+    NUMERO          reduce using rule 57 (op_logico -> = .)
+
+
+state 71
+
+    (58) op_logico -> ! .
+
+    ID              reduce using rule 58 (op_logico -> ! .)
+    NUMERO          reduce using rule 58 (op_logico -> ! .)
+
+
+state 72
+
+    (50) exp_mat -> parametro exp_mat_aux .
+
+    <               reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    >               reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    =               reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    !               reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    BEGIN           reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    ID              reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    WHILE           reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    IF              reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    WRITE           reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    READ            reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    THEN            reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    ;               reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    END             reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+    ELSE            reduce using rule 50 (exp_mat -> parametro exp_mat_aux .)
+
+
+state 73
+
+    (51) exp_mat_aux -> OP_MAT . exp_mat
+    (50) exp_mat -> . parametro exp_mat_aux
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+
+    exp_mat                        shift and go to state 101
+    parametro                      shift and go to state 38
+
+state 74
+
+    (52) exp_mat_aux -> empty .
+
+    <               reduce using rule 52 (exp_mat_aux -> empty .)
+    >               reduce using rule 52 (exp_mat_aux -> empty .)
+    =               reduce using rule 52 (exp_mat_aux -> empty .)
+    !               reduce using rule 52 (exp_mat_aux -> empty .)
+    BEGIN           reduce using rule 52 (exp_mat_aux -> empty .)
+    ID              reduce using rule 52 (exp_mat_aux -> empty .)
+    WHILE           reduce using rule 52 (exp_mat_aux -> empty .)
+    IF              reduce using rule 52 (exp_mat_aux -> empty .)
+    WRITE           reduce using rule 52 (exp_mat_aux -> empty .)
+    READ            reduce using rule 52 (exp_mat_aux -> empty .)
+    THEN            reduce using rule 52 (exp_mat_aux -> empty .)
+    ;               reduce using rule 52 (exp_mat_aux -> empty .)
+    END             reduce using rule 52 (exp_mat_aux -> empty .)
+    ELSE            reduce using rule 52 (exp_mat_aux -> empty .)
+
+
+state 75
+
+    (53) parametro -> ID nome .
+
+    OP_MAT          reduce using rule 53 (parametro -> ID nome .)
+    <               reduce using rule 53 (parametro -> ID nome .)
+    >               reduce using rule 53 (parametro -> ID nome .)
+    =               reduce using rule 53 (parametro -> ID nome .)
+    !               reduce using rule 53 (parametro -> ID nome .)
+    BEGIN           reduce using rule 53 (parametro -> ID nome .)
+    ID              reduce using rule 53 (parametro -> ID nome .)
+    WHILE           reduce using rule 53 (parametro -> ID nome .)
+    IF              reduce using rule 53 (parametro -> ID nome .)
+    WRITE           reduce using rule 53 (parametro -> ID nome .)
+    READ            reduce using rule 53 (parametro -> ID nome .)
+    THEN            reduce using rule 53 (parametro -> ID nome .)
+    ;               reduce using rule 53 (parametro -> ID nome .)
+    END             reduce using rule 53 (parametro -> ID nome .)
+    ELSE            reduce using rule 53 (parametro -> ID nome .)
+    ]               reduce using rule 53 (parametro -> ID nome .)
+    ,               reduce using rule 53 (parametro -> ID nome .)
+    )               reduce using rule 53 (parametro -> ID nome .)
+
+
+state 76
+
+    (38) comando -> IF exp_logica THEN . bloco else
+    (34) bloco -> . BEGIN comando lista_com END
+    (35) bloco -> . comando
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    BEGIN           shift and go to state 63
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    bloco                          shift and go to state 102
+    comando                        shift and go to state 64
+
+state 77
+
+    (40) comando -> READ ID nome .
+
+    ;               reduce using rule 40 (comando -> READ ID nome .)
+    END             reduce using rule 40 (comando -> READ ID nome .)
+    ELSE            reduce using rule 40 (comando -> READ ID nome .)
+
+
+state 78
+
+    (10) def_func -> funcao def_func .
+
+    BEGIN           reduce using rule 10 (def_func -> funcao def_func .)
+
+
+state 79
+
+    (27) funcao -> FUNCTION nome_funcao . bloco_funcao
+    (31) bloco_funcao -> . def_var BEGIN comando lista_com END
+    (8) def_var -> . variavel def_var
+    (9) def_var -> . empty
+    (16) variavel -> . VAR ID lista_id : tipo_dado ;
+    (63) empty -> .
+
+    VAR             shift and go to state 24
+    BEGIN           reduce using rule 63 (empty -> .)
+
+    bloco_funcao                   shift and go to state 103
+    def_var                        shift and go to state 104
+    variavel                       shift and go to state 22
+    empty                          shift and go to state 23
+
+state 80
+
+    (28) nome_funcao -> ID . param_func : tipo_dado
+    (29) param_func -> . ( campos )
+    (30) param_func -> .
+
+    (               shift and go to state 106
+    :               reduce using rule 30 (param_func -> .)
+
+    param_func                     shift and go to state 105
+
+state 81
+
+    (16) variavel -> VAR ID lista_id . : tipo_dado ;
+
+    :               shift and go to state 107
+
+
+state 82
+
+    (17) lista_id -> , . ID lista_id
+
+    ID              shift and go to state 108
+
+
+state 83
+
+    (18) lista_id -> empty .
+
+    :               reduce using rule 18 (lista_id -> empty .)
+
+
+state 84
+
+    (26) tipo_dado -> ID .
+
+    ;               reduce using rule 26 (tipo_dado -> ID .)
+    VAR             reduce using rule 26 (tipo_dado -> ID .)
+    BEGIN           reduce using rule 26 (tipo_dado -> ID .)
+    END             reduce using rule 26 (tipo_dado -> ID .)
+    )               reduce using rule 26 (tipo_dado -> ID .)
+
+
+state 85
+
+    (15) tipo -> TYPE ID = tipo_dado . ;
+
+    ;               shift and go to state 109
+
+
+state 86
+
+    (22) tipo_dado -> INTEGER .
+
+    ;               reduce using rule 22 (tipo_dado -> INTEGER .)
+    VAR             reduce using rule 22 (tipo_dado -> INTEGER .)
+    BEGIN           reduce using rule 22 (tipo_dado -> INTEGER .)
+    END             reduce using rule 22 (tipo_dado -> INTEGER .)
+    )               reduce using rule 22 (tipo_dado -> INTEGER .)
+
+
+state 87
+
+    (23) tipo_dado -> REAL .
+
+    ;               reduce using rule 23 (tipo_dado -> REAL .)
+    VAR             reduce using rule 23 (tipo_dado -> REAL .)
+    BEGIN           reduce using rule 23 (tipo_dado -> REAL .)
+    END             reduce using rule 23 (tipo_dado -> REAL .)
+    )               reduce using rule 23 (tipo_dado -> REAL .)
+
+
+state 88
+
+    (24) tipo_dado -> ARRAY . [ NUMERO ] OF tipo_dado
+
+    [               shift and go to state 110
+
+
+state 89
+
+    (25) tipo_dado -> RECORD . campos END
+    (19) campos -> . ID : tipo_dado lista_campos
+
+    ID              shift and go to state 112
+
+    campos                         shift and go to state 111
+
+state 90
+
+    (12) constante -> CONST ID = const_valor ; .
+
+    CONST           reduce using rule 12 (constante -> CONST ID = const_valor ; .)
+    TYPE            reduce using rule 12 (constante -> CONST ID = const_valor ; .)
+    VAR             reduce using rule 12 (constante -> CONST ID = const_valor ; .)
+    FUNCTION        reduce using rule 12 (constante -> CONST ID = const_valor ; .)
+    BEGIN           reduce using rule 12 (constante -> CONST ID = const_valor ; .)
+
+
+state 91
+
+    (32) lista_com -> ; comando lista_com .
+
+    END             reduce using rule 32 (lista_com -> ; comando lista_com .)
+
+
+state 92
+
+    (36) comando -> ID nome ATRIBUICAO exp_mat .
+
+    ;               reduce using rule 36 (comando -> ID nome ATRIBUICAO exp_mat .)
+    END             reduce using rule 36 (comando -> ID nome ATRIBUICAO exp_mat .)
+    ELSE            reduce using rule 36 (comando -> ID nome ATRIBUICAO exp_mat .)
+
+
+state 93
+
+    (59) nome -> . ID nome .
+
+    ATRIBUICAO      reduce using rule 59 (nome -> . ID nome .)
+    OP_MAT          reduce using rule 59 (nome -> . ID nome .)
+    <               reduce using rule 59 (nome -> . ID nome .)
+    >               reduce using rule 59 (nome -> . ID nome .)
+    =               reduce using rule 59 (nome -> . ID nome .)
+    !               reduce using rule 59 (nome -> . ID nome .)
+    BEGIN           reduce using rule 59 (nome -> . ID nome .)
+    ID              reduce using rule 59 (nome -> . ID nome .)
+    WHILE           reduce using rule 59 (nome -> . ID nome .)
+    IF              reduce using rule 59 (nome -> . ID nome .)
+    WRITE           reduce using rule 59 (nome -> . ID nome .)
+    READ            reduce using rule 59 (nome -> . ID nome .)
+    THEN            reduce using rule 59 (nome -> . ID nome .)
+    ;               reduce using rule 59 (nome -> . ID nome .)
+    END             reduce using rule 59 (nome -> . ID nome .)
+    ELSE            reduce using rule 59 (nome -> . ID nome .)
+    ]               reduce using rule 59 (nome -> . ID nome .)
+    ,               reduce using rule 59 (nome -> . ID nome .)
+    )               reduce using rule 59 (nome -> . ID nome .)
+
+
+state 94
+
+    (60) nome -> [ parametro ] .
+
+    ATRIBUICAO      reduce using rule 60 (nome -> [ parametro ] .)
+    OP_MAT          reduce using rule 60 (nome -> [ parametro ] .)
+    <               reduce using rule 60 (nome -> [ parametro ] .)
+    >               reduce using rule 60 (nome -> [ parametro ] .)
+    =               reduce using rule 60 (nome -> [ parametro ] .)
+    !               reduce using rule 60 (nome -> [ parametro ] .)
+    BEGIN           reduce using rule 60 (nome -> [ parametro ] .)
+    ID              reduce using rule 60 (nome -> [ parametro ] .)
+    WHILE           reduce using rule 60 (nome -> [ parametro ] .)
+    IF              reduce using rule 60 (nome -> [ parametro ] .)
+    WRITE           reduce using rule 60 (nome -> [ parametro ] .)
+    READ            reduce using rule 60 (nome -> [ parametro ] .)
+    THEN            reduce using rule 60 (nome -> [ parametro ] .)
+    ;               reduce using rule 60 (nome -> [ parametro ] .)
+    END             reduce using rule 60 (nome -> [ parametro ] .)
+    ELSE            reduce using rule 60 (nome -> [ parametro ] .)
+    ]               reduce using rule 60 (nome -> [ parametro ] .)
+    ,               reduce using rule 60 (nome -> [ parametro ] .)
+    )               reduce using rule 60 (nome -> [ parametro ] .)
+
+
+state 95
+
+    (61) nome -> ( lista_param ) .
+
+    ATRIBUICAO      reduce using rule 61 (nome -> ( lista_param ) .)
+    OP_MAT          reduce using rule 61 (nome -> ( lista_param ) .)
+    <               reduce using rule 61 (nome -> ( lista_param ) .)
+    >               reduce using rule 61 (nome -> ( lista_param ) .)
+    =               reduce using rule 61 (nome -> ( lista_param ) .)
+    !               reduce using rule 61 (nome -> ( lista_param ) .)
+    BEGIN           reduce using rule 61 (nome -> ( lista_param ) .)
+    ID              reduce using rule 61 (nome -> ( lista_param ) .)
+    WHILE           reduce using rule 61 (nome -> ( lista_param ) .)
+    IF              reduce using rule 61 (nome -> ( lista_param ) .)
+    WRITE           reduce using rule 61 (nome -> ( lista_param ) .)
+    READ            reduce using rule 61 (nome -> ( lista_param ) .)
+    THEN            reduce using rule 61 (nome -> ( lista_param ) .)
+    ;               reduce using rule 61 (nome -> ( lista_param ) .)
+    END             reduce using rule 61 (nome -> ( lista_param ) .)
+    ELSE            reduce using rule 61 (nome -> ( lista_param ) .)
+    ]               reduce using rule 61 (nome -> ( lista_param ) .)
+    ,               reduce using rule 61 (nome -> ( lista_param ) .)
+    )               reduce using rule 61 (nome -> ( lista_param ) .)
+
+
+state 96
+
+    (43) lista_param -> parametro lista_param_aux .
+
+    )               reduce using rule 43 (lista_param -> parametro lista_param_aux .)
+
+
+state 97
+
+    (45) lista_param_aux -> , . lista_param
+    (43) lista_param -> . parametro lista_param_aux
+    (44) lista_param -> . empty
+    (53) parametro -> . ID nome
+    (54) parametro -> . NUMERO
+    (63) empty -> .
+
+    ID              shift and go to state 39
+    NUMERO          shift and go to state 40
+    )               reduce using rule 63 (empty -> .)
+
+    lista_param                    shift and go to state 113
+    parametro                      shift and go to state 60
+    empty                          shift and go to state 61
+
+state 98
+
+    (46) lista_param_aux -> empty .
+
+    )               reduce using rule 46 (lista_param_aux -> empty .)
+
+
+state 99
+
+    (34) bloco -> BEGIN comando . lista_com END
+    (32) lista_com -> . ; comando lista_com
+    (33) lista_com -> . empty
+    (63) empty -> .
+
+    ;               shift and go to state 29
+    END             reduce using rule 63 (empty -> .)
+
+    lista_com                      shift and go to state 114
+    empty                          shift and go to state 30
+
+state 100
+
+    (48) exp_logica_aux -> op_logico exp_logica .
+
+    BEGIN           reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+    ID              reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+    WHILE           reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+    IF              reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+    WRITE           reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+    READ            reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+    THEN            reduce using rule 48 (exp_logica_aux -> op_logico exp_logica .)
+
+
+state 101
+
+    (51) exp_mat_aux -> OP_MAT exp_mat .
+
+    <               reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    >               reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    =               reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    !               reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    BEGIN           reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    ID              reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    WHILE           reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    IF              reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    WRITE           reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    READ            reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    THEN            reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    ;               reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    END             reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+    ELSE            reduce using rule 51 (exp_mat_aux -> OP_MAT exp_mat .)
+
+
+state 102
+
+    (38) comando -> IF exp_logica THEN bloco . else
+    (41) else -> . ELSE bloco
+    (42) else -> . empty
+    (63) empty -> .
+
+  ! shift/reduce conflict for ELSE resolved as shift
+    ELSE            shift and go to state 116
+    ;               reduce using rule 63 (empty -> .)
+    END             reduce using rule 63 (empty -> .)
+
+  ! ELSE            [ reduce using rule 63 (empty -> .) ]
+
+    else                           shift and go to state 115
+    empty                          shift and go to state 117
+
+state 103
+
+    (27) funcao -> FUNCTION nome_funcao bloco_funcao .
+
+    FUNCTION        reduce using rule 27 (funcao -> FUNCTION nome_funcao bloco_funcao .)
+    BEGIN           reduce using rule 27 (funcao -> FUNCTION nome_funcao bloco_funcao .)
+
+
+state 104
+
+    (31) bloco_funcao -> def_var . BEGIN comando lista_com END
+
+    BEGIN           shift and go to state 118
+
+
+state 105
+
+    (28) nome_funcao -> ID param_func . : tipo_dado
+
+    :               shift and go to state 119
+
+
+state 106
+
+    (29) param_func -> ( . campos )
+    (19) campos -> . ID : tipo_dado lista_campos
+
+    ID              shift and go to state 112
+
+    campos                         shift and go to state 120
+
+state 107
+
+    (16) variavel -> VAR ID lista_id : . tipo_dado ;
+    (22) tipo_dado -> . INTEGER
+    (23) tipo_dado -> . REAL
+    (24) tipo_dado -> . ARRAY [ NUMERO ] OF tipo_dado
+    (25) tipo_dado -> . RECORD campos END
+    (26) tipo_dado -> . ID
+
+    INTEGER         shift and go to state 86
+    REAL            shift and go to state 87
+    ARRAY           shift and go to state 88
+    RECORD          shift and go to state 89
+    ID              shift and go to state 84
+
+    tipo_dado                      shift and go to state 121
+
+state 108
+
+    (17) lista_id -> , ID . lista_id
+    (17) lista_id -> . , ID lista_id
+    (18) lista_id -> . empty
+    (63) empty -> .
+
+    ,               shift and go to state 82
+    :               reduce using rule 63 (empty -> .)
+
+    lista_id                       shift and go to state 122
+    empty                          shift and go to state 83
+
+state 109
+
+    (15) tipo -> TYPE ID = tipo_dado ; .
+
+    TYPE            reduce using rule 15 (tipo -> TYPE ID = tipo_dado ; .)
+    VAR             reduce using rule 15 (tipo -> TYPE ID = tipo_dado ; .)
+    FUNCTION        reduce using rule 15 (tipo -> TYPE ID = tipo_dado ; .)
+    BEGIN           reduce using rule 15 (tipo -> TYPE ID = tipo_dado ; .)
+
+
+state 110
+
+    (24) tipo_dado -> ARRAY [ . NUMERO ] OF tipo_dado
+
+    NUMERO          shift and go to state 123
+
+
+state 111
+
+    (25) tipo_dado -> RECORD campos . END
+
+    END             shift and go to state 124
+
+
+state 112
+
+    (19) campos -> ID . : tipo_dado lista_campos
+
+    :               shift and go to state 125
+
+
+state 113
+
+    (45) lista_param_aux -> , lista_param .
+
+    )               reduce using rule 45 (lista_param_aux -> , lista_param .)
+
+
+state 114
+
+    (34) bloco -> BEGIN comando lista_com . END
+
+    END             shift and go to state 126
+
+
+state 115
+
+    (38) comando -> IF exp_logica THEN bloco else .
+
+    ;               reduce using rule 38 (comando -> IF exp_logica THEN bloco else .)
+    END             reduce using rule 38 (comando -> IF exp_logica THEN bloco else .)
+    ELSE            reduce using rule 38 (comando -> IF exp_logica THEN bloco else .)
+
+
+state 116
+
+    (41) else -> ELSE . bloco
+    (34) bloco -> . BEGIN comando lista_com END
+    (35) bloco -> . comando
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    BEGIN           shift and go to state 63
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    bloco                          shift and go to state 127
+    comando                        shift and go to state 64
+
+state 117
+
+    (42) else -> empty .
+
+    ;               reduce using rule 42 (else -> empty .)
+    END             reduce using rule 42 (else -> empty .)
+    ELSE            reduce using rule 42 (else -> empty .)
+
+
+state 118
+
+    (31) bloco_funcao -> def_var BEGIN . comando lista_com END
+    (36) comando -> . ID nome ATRIBUICAO exp_mat
+    (37) comando -> . WHILE exp_logica bloco
+    (38) comando -> . IF exp_logica THEN bloco else
+    (39) comando -> . WRITE const_valor
+    (40) comando -> . READ ID nome
+
+    ID              shift and go to state 16
+    WHILE           shift and go to state 17
+    IF              shift and go to state 18
+    WRITE           shift and go to state 19
+    READ            shift and go to state 20
+
+    comando                        shift and go to state 128
+
+state 119
+
+    (28) nome_funcao -> ID param_func : . tipo_dado
+    (22) tipo_dado -> . INTEGER
+    (23) tipo_dado -> . REAL
+    (24) tipo_dado -> . ARRAY [ NUMERO ] OF tipo_dado
+    (25) tipo_dado -> . RECORD campos END
+    (26) tipo_dado -> . ID
+
+    INTEGER         shift and go to state 86
+    REAL            shift and go to state 87
+    ARRAY           shift and go to state 88
+    RECORD          shift and go to state 89
+    ID              shift and go to state 84
+
+    tipo_dado                      shift and go to state 129
+
+state 120
+
+    (29) param_func -> ( campos . )
+
+    )               shift and go to state 130
+
+
+state 121
+
+    (16) variavel -> VAR ID lista_id : tipo_dado . ;
+
+    ;               shift and go to state 131
+
+
+state 122
+
+    (17) lista_id -> , ID lista_id .
+
+    :               reduce using rule 17 (lista_id -> , ID lista_id .)
+
+
+state 123
+
+    (24) tipo_dado -> ARRAY [ NUMERO . ] OF tipo_dado
+
+    ]               shift and go to state 132
+
+
+state 124
+
+    (25) tipo_dado -> RECORD campos END .
+
+    ;               reduce using rule 25 (tipo_dado -> RECORD campos END .)
+    VAR             reduce using rule 25 (tipo_dado -> RECORD campos END .)
+    BEGIN           reduce using rule 25 (tipo_dado -> RECORD campos END .)
+    END             reduce using rule 25 (tipo_dado -> RECORD campos END .)
+    )               reduce using rule 25 (tipo_dado -> RECORD campos END .)
+
+
+state 125
+
+    (19) campos -> ID : . tipo_dado lista_campos
+    (22) tipo_dado -> . INTEGER
+    (23) tipo_dado -> . REAL
+    (24) tipo_dado -> . ARRAY [ NUMERO ] OF tipo_dado
+    (25) tipo_dado -> . RECORD campos END
+    (26) tipo_dado -> . ID
+
+    INTEGER         shift and go to state 86
+    REAL            shift and go to state 87
+    ARRAY           shift and go to state 88
+    RECORD          shift and go to state 89
+    ID              shift and go to state 84
+
+    tipo_dado                      shift and go to state 133
+
+state 126
+
+    (34) bloco -> BEGIN comando lista_com END .
+
+    ;               reduce using rule 34 (bloco -> BEGIN comando lista_com END .)
+    END             reduce using rule 34 (bloco -> BEGIN comando lista_com END .)
+    ELSE            reduce using rule 34 (bloco -> BEGIN comando lista_com END .)
+
+
+state 127
+
+    (41) else -> ELSE bloco .
+
+    ;               reduce using rule 41 (else -> ELSE bloco .)
+    END             reduce using rule 41 (else -> ELSE bloco .)
+    ELSE            reduce using rule 41 (else -> ELSE bloco .)
+
+
+state 128
+
+    (31) bloco_funcao -> def_var BEGIN comando . lista_com END
+    (32) lista_com -> . ; comando lista_com
+    (33) lista_com -> . empty
+    (63) empty -> .
+
+    ;               shift and go to state 29
+    END             reduce using rule 63 (empty -> .)
+
+    lista_com                      shift and go to state 134
+    empty                          shift and go to state 30
+
+state 129
+
+    (28) nome_funcao -> ID param_func : tipo_dado .
+
+    VAR             reduce using rule 28 (nome_funcao -> ID param_func : tipo_dado .)
+    BEGIN           reduce using rule 28 (nome_funcao -> ID param_func : tipo_dado .)
+
+
+state 130
+
+    (29) param_func -> ( campos ) .
+
+    :               reduce using rule 29 (param_func -> ( campos ) .)
+
+
+state 131
+
+    (16) variavel -> VAR ID lista_id : tipo_dado ; .
+
+    VAR             reduce using rule 16 (variavel -> VAR ID lista_id : tipo_dado ; .)
+    FUNCTION        reduce using rule 16 (variavel -> VAR ID lista_id : tipo_dado ; .)
+    BEGIN           reduce using rule 16 (variavel -> VAR ID lista_id : tipo_dado ; .)
+
+
+state 132
+
+    (24) tipo_dado -> ARRAY [ NUMERO ] . OF tipo_dado
+
+    OF              shift and go to state 135
+
+
+state 133
+
+    (19) campos -> ID : tipo_dado . lista_campos
+    (20) lista_campos -> . ; campos
+    (21) lista_campos -> . empty
+    (63) empty -> .
+
+    ;               shift and go to state 137
+    END             reduce using rule 63 (empty -> .)
+    )               reduce using rule 63 (empty -> .)
+
+    lista_campos                   shift and go to state 136
+    empty                          shift and go to state 138
+
+state 134
+
+    (31) bloco_funcao -> def_var BEGIN comando lista_com . END
+
+    END             shift and go to state 139
+
+
+state 135
+
+    (24) tipo_dado -> ARRAY [ NUMERO ] OF . tipo_dado
+    (22) tipo_dado -> . INTEGER
+    (23) tipo_dado -> . REAL
+    (24) tipo_dado -> . ARRAY [ NUMERO ] OF tipo_dado
+    (25) tipo_dado -> . RECORD campos END
+    (26) tipo_dado -> . ID
+
+    INTEGER         shift and go to state 86
+    REAL            shift and go to state 87
+    ARRAY           shift and go to state 88
+    RECORD          shift and go to state 89
+    ID              shift and go to state 84
+
+    tipo_dado                      shift and go to state 140
+
+state 136
+
+    (19) campos -> ID : tipo_dado lista_campos .
+
+    END             reduce using rule 19 (campos -> ID : tipo_dado lista_campos .)
+    )               reduce using rule 19 (campos -> ID : tipo_dado lista_campos .)
+
+
+state 137
+
+    (20) lista_campos -> ; . campos
+    (19) campos -> . ID : tipo_dado lista_campos
+
+    ID              shift and go to state 112
+
+    campos                         shift and go to state 141
+
+state 138
+
+    (21) lista_campos -> empty .
+
+    END             reduce using rule 21 (lista_campos -> empty .)
+    )               reduce using rule 21 (lista_campos -> empty .)
+
+
+state 139
+
+    (31) bloco_funcao -> def_var BEGIN comando lista_com END .
+
+    FUNCTION        reduce using rule 31 (bloco_funcao -> def_var BEGIN comando lista_com END .)
+    BEGIN           reduce using rule 31 (bloco_funcao -> def_var BEGIN comando lista_com END .)
+
+
+state 140
+
+    (24) tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado .
+
+    ;               reduce using rule 24 (tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado .)
+    VAR             reduce using rule 24 (tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado .)
+    BEGIN           reduce using rule 24 (tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado .)
+    END             reduce using rule 24 (tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado .)
+    )               reduce using rule 24 (tipo_dado -> ARRAY [ NUMERO ] OF tipo_dado .)
+
+
+state 141
+
+    (20) lista_campos -> ; campos .
+
+    END             reduce using rule 20 (lista_campos -> ; campos .)
+    )               reduce using rule 20 (lista_campos -> ; campos .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for ELSE in state 102 resolved as shift
