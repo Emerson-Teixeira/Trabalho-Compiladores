@@ -52,21 +52,36 @@ def p_tipo(p):
 
 def p_variavel(p):
     "variavel : VAR ID lista_id ':' tipo_dado ';'"
-
+    
     # Essa linha deve adcionar um registro na tabela de símbolos
     # O registro vai ser uma entrada no dicionário "tabela_sim"
     # Que liga o ID à uma outra tabela, com campos variados como type
     tabela_sim.update({p[2]: {'type':p[5]}})
+
+    if (p[3]):
+        for i in p[3]:
+            print(i)
+            tabela_sim.update({i: {'type':p[5]}})
     
     print ('Regra variável reconhecida')
-
+    
 def p_lista_id(p):
     '''lista_id : ',' ID lista_id
                 | empty''' #empty rule
+
+    if (p[1] != None):
+        if (p[3]):
+            p[0] = p[3] + [p[2]]
+        else:
+            p[0] = [p[2]]
+ 
     print("Lista ID reconhecido")
 
 def p_campos(p):
     "campos : ID ':' tipo_dado lista_campos"
+    
+    tabela_sim.update({p[1]: {'type':p[3]}})
+    
     print("campos reconhecido")
 
 def p_lista_campos(p):
@@ -270,7 +285,7 @@ C := exp(A,B);
 D := media(E);
 F := lerDados()
 end
-'''))
+''', debug=True))
 
 print(tabela_sim)
 
