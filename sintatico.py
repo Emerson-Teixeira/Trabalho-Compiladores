@@ -1,6 +1,10 @@
 import ply.yacc as yacc
 from lexico import tokens
 
+# Será a tabela de simbolos, implementada como um dicionário aninhado.
+# Depois tem que pensar como fazer escopo dessa forma, se for necessário.
+tabela_sim = {}
+
 def p_programa(p):
     'programa : declaracoes principal'
     print('Programa reconhecido')
@@ -48,8 +52,13 @@ def p_tipo(p):
 
 def p_variavel(p):
     "variavel : VAR ID lista_id ':' tipo_dado ';'"
+
+    # Essa linha deve adcionar um registro na tabela de símbolos
+    # O registro vai ser uma entrada no dicionário "tabela_sim"
+    # Que liga o ID à uma outra tabela, com campos variados como type
+    tabela_sim.update({p[2]: {'type':p[5]}})
+    
     print ('Regra variável reconhecida')
- # so para conseguir checar se chegou aqui
 
 def p_lista_id(p):
     '''lista_id : ',' ID lista_id
@@ -71,6 +80,11 @@ def p_tipo_dado(p):
                  | ARRAY '[' NUMERO ']' OF tipo_dado
                  | RECORD campos END
                  | ID'''
+
+    # Funciona porque o tipo é sempre o primeiro símbolo na parte
+    # direita da regra.
+    p[0] = p[1]
+    
     print("Tipo_dado reconhecido")
 
 def p_funcao(p):
@@ -196,7 +210,7 @@ var E : vetor;
 var F : aluno;
 function fatorial(a:integer) : integer
 var i : integer;
-
+begin
 i := 1;
 result:=1;
 while i < a
@@ -257,6 +271,8 @@ D := media(E);
 F := lerDados()
 end
 '''))
+
+print(tabela_sim)
 
 """
 while True:
