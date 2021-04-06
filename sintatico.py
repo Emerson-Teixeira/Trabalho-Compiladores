@@ -3,23 +3,30 @@ from lexico import tokens
 
 # Será a tabela de simbolos, implementada como um dicionário aninhado.
 tabela_sim = {}
+
 # Lista com a tabelas de símbolos, importante para lidar com escopo.
 lista_tab = [tabela_sim]
 
 def new_scope_push():
-    '''Cria uma nova tabela de símbolos, adciona ao final da lista de tabelas de simbolo,
-       atualiza a referência da tabela de símbolos para a recém criada'''
     global tabela_sim
     global lista_tab
+
+    # Cria o novo escopo
     new_tab = {}
+
+    # Adciona na pilha de escopos
     lista_tab = lista_tab + [new_tab]
+
+    # Atualiza a referência pra tabela de símbolos
     tabela_sim = new_tab
 
 def del_scope_pop():
     global tabela_sim
     global lista_tab
+
     # Exclui o último elemento da lista
     lista_tab = lista_tab[:-1]
+
     # Atualiza a referencia pra tabela de símbolos
     tabela_sim = lista_tab[-1]
 
@@ -305,7 +312,7 @@ end
 begin
 A:=TAM + 20;
 B := fatorial(A);
-C := exp(A,B);
+ppC := exp(A,B);
 D := media(E);
 F := lerDados()
 end
