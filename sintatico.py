@@ -1,5 +1,6 @@
 import ply.yacc as yacc
 from lexico import tokens
+from pprint import pprint
 
 # Será a tabela de simbolos, implementada como um dicionário aninhado.
 tabela_sim = {}
@@ -129,12 +130,14 @@ def p_tipo_dado(p):
 
 def p_funcao(p):
     '''funcao : FUNCTION new_scope nome_funcao bloco_funcao'''
-    print(tabela_sim)
+    print("Escopo da função: ", p[3][0], "\n", tabela_sim)
     del_scope_pop()
+    tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1]}})
     print('Funcao reconhecido')
 
 def p_nome_funcao(p):
     '''nome_funcao : ID param_func ':' tipo_dado'''
+    p[0] = (p[1], p[4])
     print('Nome_funcao reconhecido')
 
 def p_param_func(p):
@@ -318,7 +321,7 @@ F := lerDados()
 end
 '''))
 
-print(tabela_sim)
+pprint(tabela_sim)
 
 """
 while True:
