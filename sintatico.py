@@ -2,8 +2,26 @@ import ply.yacc as yacc
 from lexico import tokens
 
 # Será a tabela de simbolos, implementada como um dicionário aninhado.
-# Depois tem que pensar como fazer escopo dessa forma, se for necessário.
 tabela_sim = {}
+# Lista com a tabelas de símbolos, importante para lidar com escopo.
+lista_tab = [tabela_sim]
+
+def new_scope_push():
+    '''Cria uma nova tabela de símbolos, adciona ao final da lista de tabelas de simbolo,
+       atualiza a referência da tabela de símbolos para a recém criada'''
+    global tabela_sim
+    global lista_tab
+    new_tab = {}
+    lista_tab = lista_tab + [new_tab]
+    tabela_sim = new_tab
+
+def del_scope_pop():
+    global tabela_sim
+    global lista_tab
+    # Exclui o último elemento da lista
+    lista_tab = lista_tab[:-1]
+    # Atualiza a referencia pra tabela de símbolos
+    tabela_sim = lista_tab[-1]
 
 def p_programa(p):
     'programa : declaracoes principal'
@@ -103,7 +121,9 @@ def p_tipo_dado(p):
     print("Tipo_dado reconhecido")
 
 def p_funcao(p):
-    '''funcao : FUNCTION nome_funcao bloco_funcao'''
+    '''funcao : FUNCTION new_scope nome_funcao bloco_funcao'''
+    print(tabela_sim)
+    del_scope_pop()
     print('Funcao reconhecido')
 
 def p_nome_funcao(p):
@@ -185,6 +205,10 @@ def p_nome(p):
             | '(' lista_param ')'
             | empty''' # empty rule
     print('nome reconhecido')
+
+def p_new_scope(p):
+    "new_scope :"
+    new_scope_push()
 
 def p_empty(p):
      'empty :'
@@ -285,7 +309,7 @@ C := exp(A,B);
 D := media(E);
 F := lerDados()
 end
-''', debug=True))
+'''))
 
 print(tabela_sim)
 
