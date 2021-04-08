@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from lexico import tokens
 from pprint import pprint
+import pdb
 
 # Será a tabela de simbolos, implementada como um dicionário aninhado.
 tabela_sim = {}
@@ -229,20 +230,23 @@ def p_parametro(p):
 
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
+    
     try:
         if (isinstance(p[2], str)):
-            print(p[2])
-            pprint(tabela_sim)
+            # print(p[2])
+            # pprint(tabela_sim)
             if (tabela_sim[p[1]]['type'] == 'function'):
                 p[0] = tabela_sim[p[1]]['return_type']
-            elif(p[2] in ['indice_array']):
-                if (tabela_sim[p[1]]['type'] == 'array'):
-                    p[0] = tabela_sim[p[1]]['array_type']
-                    print("\n\n", p[0], "\n\n")
-                elif (tabela_sim[tabela_sim[p[1]]['type']]['ttype'] == 'array'):
-                    p[0] = tabela_sim[tabela_sim[p[1]]['type']]['type_array']
-                    print("\n\n", p[0], "\n\n")
-                else:
+            elif(p[2] == 'indice_array'):
+                try:
+                    # pdb.set_trace()
+                    if (tabela_sim[p[1]]['type'] == 'array'):
+                        p[0] = tabela_sim[p[1]]['array_type']
+                        # print("\n\n", p[0], "\n\n")
+                    elif (lista_tab[-2][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
+                        p[0] = lista_tab[-2][tabela_sim[p[1]]['type']]['type_array']
+                        # print("\n\n", p[0], "\n\n")
+                except:
                     print(p[1])
                     print("Erro semântico, acessando indice de algo que não é array!!!!")
             else:
