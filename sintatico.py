@@ -46,22 +46,18 @@ def p_declaracoes(p):
 def p_def_const(p):
     '''def_const : constante def_const
                  | empty''' # empty rule
-    print('def_const reconhecido')
     
 def p_def_tipos(p):
     '''def_tipos : tipo def_tipos
                  | empty''' # empty rule
-    print("Def_tipos reconhecido")
 
 def p_def_var(p):
     '''def_var : variavel def_var
                | empty''' # empty rule
-    print("Def_var reconhecido")
 
 def p_def_func(p):
     '''def_func : funcao def_func
                 | empty'''
-    print("Def_func reconhecido")
 
 def p_constante(p):
     '''constante : CONST ID '=' const_valor ';' '''
@@ -70,11 +66,17 @@ def p_constante(p):
 def p_const_valor(p):
     '''const_valor : CONST_VALOR
                    | exp_mat'''
-    print('const_valor reconhecido')
 
 def p_tipo(p):
     '''tipo : TYPE ID '=' tipo_dado ';' '''
-    print('Tipo reconhecido')
+    if (isinstance(p[4], tuple)):
+        if (p[4][0] == 'array'):
+            tabela_sim.update({p[2]: {'type': 'type', 'ttype':'array', 'type_array': p[4][2], 'n_indices' : p[4][1]}})
+        else: # então é record
+            tabela_sim.update({p[2]: {'type': 'type', 'ttype':'record', 'var_record': {}}})
+            for i in p[4][1][1]: # Lista vinda da regra campos
+                tabela_sim[p[2]]['var_record'].update({i[0] : {'type' : i[1]}})
+        # precisa tratar integer real e id
 
 def p_variavel(p):
     "variavel : VAR ID lista_id ':' tipo_dado ';'"
@@ -82,14 +84,14 @@ def p_variavel(p):
     # Essa linha deve adcionar um registro na tabela de símbolos
     # O registro vai ser uma entrada no dicionário "tabela_sim"
     # Que liga o ID à uma outra tabela, com campos variados como type
+    if (isinstance(p[5], tuple)):
+        tabela_sim.update({p[2] : {'type': p[5][0], 'type_array' : p[5][1]}})
+        
     tabela_sim.update({p[2]: {'type':p[5]}})
 
     if (p[3]):
         for i in p[3]:
-            print(i)
             tabela_sim.update({i: {'type':p[5]}})
-    
-    print ('Regra variável reconhecida')
     
 def p_lista_id(p):
     '''lista_id : ',' ID lista_id
@@ -100,28 +102,20 @@ def p_lista_id(p):
             p[0] = p[3] + [p[2]]
         else:
             p[0] = [p[2]]
- 
-    print("Lista ID reconhecido")
 
 def p_campos(p):
     "campos : ID ':' tipo_dado lista_campos"
-    
-    tabela_sim.update({p[1]: {'type':p[3]}})
 
-    p[0] = 1 + p[4]
-    
-    print("campos reconhecido")
+    p[0] = (1 + p[4][0], p[4][1] + [(p[1], p[3])])
 
 def p_lista_campos(p):
     '''lista_campos : ';' campos
                     | empty ''' #empty rule
 
     if (p[1] == None):
-        p[0] = 0
+        p[0] = (0, [])
     else:
         p[0] = p[2]
-        
-    print("lista_campos reconhecido")
     
 def p_tipo_dado(p):
     '''tipo_dado : INTEGER
@@ -130,49 +124,50 @@ def p_tipo_dado(p):
                  | RECORD campos END
                  | ID'''
 
-    # Funciona porque o tipo é sempre o primeiro símbolo na parte
-    # direita da regra.
-    p[0] = p[1]
-    
-    print("Tipo_dado reconhecido")
+    if (p[1] == 'array'):
+        p[0] = (p[1], p[3], p[6])
+    elif (p[1] == 'record'):
+        p[0] = (p[1], p[2])
+    else:
+        p[0] = p[1]
 
 def p_funcao(p):
     '''funcao : FUNCTION new_scope nome_funcao bloco_funcao'''
-    print("Escopo da função: ", p[3][0], "\n", tabela_sim)
+    print("Escopo da função:", p[3][0])
+    pprint(tabela_sim)
+    print("\n")
     del_scope_pop()
     tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1], "n_param" : p[3][2]}})
-    print('Funcao reconhecido')
 
 def p_nome_funcao(p):
     '''nome_funcao : ID param_func ':' tipo_dado'''
     tabela_sim.update({'result' : {'type' : p[4]}, 'nome' : p[1]})
     p[0] = (p[1], p[4], p[2])
-    print('Nome_funcao reconhecido')
 
 def p_param_func(p):
-    '''param_func : '(' campos ')'
+    '''param_func : '(' campos ')' 
                   | empty '''
 
     if (p[1] == None):
         p[0] = 0
-    else:
-        p[0] = p[2]
-    
-    print('param_func reconhecido')
+    else: # Retornando o número de parâmetros
+        p[0] = p[2][0]
+
+    # Adcionando os parametros como variaveis no escopo interno da função
+    if (p[1] != None):
+        for i in p[2][1]:
+            tabela_sim.update({i[0] : {'type' : i[1]}})
 
 def p_bloco_funcao(p):
     '''bloco_funcao : def_var BEGIN comando lista_com END'''
-    print("Bloco_funcao reconhecido")
 
 def p_lista_com(p):
     '''lista_com : ';' comando lista_com
                  | empty''' # empty rule
-    print('Lista_com reconhecido')
 
 def p_bloco(p):
     '''bloco : BEGIN comando lista_com END
              | comando''' # empty rule
-    print("Bloco reconhecido")
 
 def p_comando(p):
     '''comando : ID nome ATRIBUICAO exp_mat
@@ -183,8 +178,6 @@ def p_comando(p):
 
     if (p[1] not in ['while', 'if', 'write', 'read']):
         if (p[1] in tabela_sim):
-            print( "\n\n Variavel declarada antes do \n\n")
-            print( p[4] )
             for i in p[4]:
                 if (tabela_sim[p[1]]['type'] == 'real'):
                     if (i not in ['real', 'integer']):
@@ -200,12 +193,10 @@ def p_comando(p):
 def p_else(p):
     '''else : ELSE bloco
             | empty''' # empty rule
-    print('else reconhecido')
 
 def p_lista_param(p):
     '''lista_param : parametro lista_param_aux
                    | empty''' # empty rule
-    print('lista_param reconhecido')
 
 def p_lista_param_aux(p):
     '''lista_param_aux : ',' lista_param
@@ -213,7 +204,6 @@ def p_lista_param_aux(p):
 
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
-    print('exp_logica reconhecida')
 
 def p_exp_logica_aux(p):
     '''exp_logica_aux : op_logico exp_logica
@@ -222,7 +212,6 @@ def p_exp_logica_aux(p):
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
     p[0] = p[2] + [p[1]]
-    print('\n\nexp_mat reconhecido: ', p[0], '\n\n')
 
 def p_exp_mat_aux(p):
     '''exp_mat_aux : OP_MAT exp_mat
@@ -241,36 +230,45 @@ def p_parametro(p):
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
     try:
-        p[2]
-        if (tabela_sim[p[1]]['type'] == 'function'):
-            p[0] = tabela_sim[p[1]]['return_type']
-            print("\n\nRetornou função: ", p[0], "\n\n")
-        else:
-            p[0] = tabela_sim[p[1]]['type']
-            print("\n\nRetornou ", p[0], "\n\n")
+        if (isinstance(p[2], str)):
+            print(p[2])
+            pprint(tabela_sim)
+            if (tabela_sim[p[1]]['type'] == 'function'):
+                p[0] = tabela_sim[p[1]]['return_type']
+            elif(p[2] in ['indice_array']):
+                if (tabela_sim[p[1]]['type'] == 'array'):
+                    p[0] = tabela_sim[p[1]]['array_type']
+                    print("\n\n", p[0], "\n\n")
+                elif (tabela_sim[tabela_sim[p[1]]['type']]['ttype'] == 'array'):
+                    p[0] = tabela_sim[tabela_sim[p[1]]['type']]['type_array']
+                    print("\n\n", p[0], "\n\n")
+                else:
+                    print(p[1])
+                    print("Erro semântico, acessando indice de algo que não é array!!!!")
+            else:
+                p[0] = tabela_sim[p[1]]['type']
     except:
          if (p[1].find('.') != -1):
              p[0] = 'real'
-             print("\n\n Retornou float \n\n")
          else:
              p[0] = 'integer'
-             print("\n\n Retornou int \n\n")
-        
-    print('parametro reconhecido')
 
 def p_op_logico(p):
     '''op_logico : '<'
                  | '>'
                  | '='
                  | '!' '''
-    print('Operador Logico reconhecido')   
 
 def p_nome(p):
     '''nome : '.' ID nome
             | '[' parametro ']'
             | '(' lista_param ')'
             | empty''' # empty rule
-    print('nome reconhecido')
+
+    if (p[1] == '['):
+        p[0] = 'indice_array'
+    else:
+        p[0] = 'string'
 
 def p_new_scope(p):
     "new_scope :"
@@ -318,7 +316,7 @@ var i : integer;
 begin
 i := 1;
 result:=1;
-while i < a
+while i[1] < a
 begin
 result:=result*i;
 i:=i+1
@@ -366,7 +364,7 @@ function media(a : vetor) : integer
 var m : integer;
 begin
 m := maior(a) + menor(a);
-result := m / 2
+result := m[2] / 2
 end
 begin
 A:=TAM + 20;
