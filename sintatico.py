@@ -34,15 +34,13 @@ def del_scope_pop():
 
 def p_programa(p):
     'programa : declaracoes principal'
-    print('Programa reconhecido')
+    p[0] = 'Concluido'
 
 def p_principal(p):
     'principal : BEGIN comando lista_com END'
-    print('Principal reconhecido')
 
 def p_declaracoes(p):
     'declaracoes : def_const def_tipos def_var def_func'
-    print('Declarações reconhecido')
 
 def p_def_const(p):
     '''def_const : constante def_const
@@ -77,7 +75,7 @@ def p_tipo(p):
             tabela_sim.update({p[2]: {'type': 'type', 'ttype':'record', 'var_record': {}}})
             for i in p[4][1][1]: # Lista vinda da regra campos
                 tabela_sim[p[2]]['var_record'].update({i[0] : {'type' : i[1]}})
-        # precisa tratar integer real e id
+
 
 def p_variavel(p):
     "variavel : VAR ID lista_id ':' tipo_dado ';'"
@@ -177,19 +175,25 @@ def p_comando(p):
                | WRITE const_valor
                | READ ID nome'''
 
+    # Primeira e segunda regra semântica
     if (p[1] not in ['while', 'if', 'write', 'read']):
         if (p[1] in tabela_sim):
             for i in p[4]:
-                if (tabela_sim[p[1]]['type'] == 'real'):
-                    if (i not in ['real', 'integer']):
-                        print("Erro semântico tipo esperado não encontrado da variável: ", p[1])
-                    else:
-                        continue
-                if (tabela_sim[p[1]]['type'] != i):
-                    print("Erro semântico tipo esperado não encontrado da variável: ", p[1])
+                tipo_esperado = tabela_sim[p[1]]['type']
+                if (tipo_esperado != i):
+                    print("\n\nErro semântico!")
+                    print("Esperado o tipo: ", tipo_esperado)
+                    print("Encontrado o tipo: ", i)
+                    print("Na variável: ", p[1])
+                    try:
+                        nome = tabela_sim['nome']
+                        print("No escopo da função: ", nome)
+                    except:
+                        print("No escopo global")
+                    print("\n")
         else:
-            print( "\n\n não foi: ", p[1], " \n\n" )
-
+            print("\n\nErro semântico!")
+            print("Referência à uma váriavel não declarada: ", p[1], "\n\n")
 
 def p_else(p):
     '''else : ELSE bloco
@@ -199,10 +203,20 @@ def p_lista_param(p):
     '''lista_param : parametro lista_param_aux
                    | empty''' # empty rule
 
+    if(p[1] != None):
+        p[0] = p[2] + 1
+    else:
+        p[0] = 0
+
 def p_lista_param_aux(p):
     '''lista_param_aux : ',' lista_param
                        | empty''' # empty rule
 
+    if (p[1] == None):
+        p[0] = 0
+    else:
+        p[0] = p[2]
+    
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
 
@@ -225,32 +239,46 @@ def p_exp_mat_aux(p):
 def p_parametro(p):
     '''parametro : ID nome
                  | NUMERO'''
-    
-    global tabela_sim
-
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
     
     try:
         if (isinstance(p[2], str)):
-            # print(p[2])
-            # pprint(tabela_sim)
-            if (tabela_sim[p[1]]['type'] == 'function'):
-                p[0] = tabela_sim[p[1]]['return_type']
-            elif(p[2] == 'indice_array'):
+            if(p[2] == 'indice_array'):
                 try:
-                    # pdb.set_trace()
                     if (tabela_sim[p[1]]['type'] == 'array'):
                         p[0] = tabela_sim[p[1]]['array_type']
-                        # print("\n\n", p[0], "\n\n")
-                    elif (lista_tab[-2][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
-                        p[0] = lista_tab[-2][tabela_sim[p[1]]['type']]['type_array']
-                        # print("\n\n", p[0], "\n\n")
+                    elif (lista_tab[0][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
+                        p[0] = lista_tab[0][tabela_sim[p[1]]['type']]['type_array']
                 except:
                     print(p[1])
-                    print("Erro semântico, acessando indice de algo que não é array!!!!")
+                    print("Erro semântico, acessando indice de algo que não é array!!!!")  
             else:
                 p[0] = tabela_sim[p[1]]['type']
+        elif (isinstance(p[2], tuple)): # Então é record ou função
+            if (p[2][0] == 'record_field'):
+                try:
+                    var_interna = lista_tab[0][tabela_sim[p[1]]['type']]['var_record']
+                    try:
+                        p[0] = var_interna[p[2][1]]
+                    except:
+                        # Ultima regra
+                        print("Erro semantico, tentou acessar campo não existente do record")
+                except:
+                    # penultima regra
+                    print("Erro semântico, variável não é do tipo record: ", p[1])
+            if (p[2][0] == 'param_func'):
+                try:
+                    if (lista_tab[0][p[1]]['type'] == 'function'):
+                        p[0] = lista_tab[0][p[1]]['return_type']
+                        if(lista_tab[0][p[1]]['n_param'] != p[2][1]):
+                            # não tem o mesmo número de parametro do protótipo
+                            print("não tem o mesmo número de parametro do protótipo: ", p[1])
+                    else:
+                        print("não é função declarada", p[1])
+                except:
+                    # não é função declarada
+                    print("não é função declarada")
     except:
          if (p[1].find('.') != -1):
              p[0] = 'real'
@@ -271,6 +299,10 @@ def p_nome(p):
 
     if (p[1] == '['):
         p[0] = 'indice_array'
+    elif (p[1] == '.'):
+        p[0] = ('record_field', p[2])
+    elif (p[1] == '('):
+        p[0] = ('param_func', p[2]) # p[2] contém numero de parametros
     else:
         p[0] = 'string'
 
@@ -320,7 +352,7 @@ var i : integer;
 begin
 i := 1;
 result:=1;
-while i[1] < a
+while i < a
 begin
 result:=result*i;
 i:=i+1
@@ -344,7 +376,8 @@ function lerDados : aluno
 begin
 write "digite as notas do aluno";
 read result.nota1;
-read result.nota2
+read result.nota2;
+read result.nota3
 end
 function maior(a : vetor) : integer
 var i : integer;
@@ -368,7 +401,7 @@ function media(a : vetor) : integer
 var m : integer;
 begin
 m := maior(a) + menor(a);
-result := m[2] / 2
+result := m / 2
 end
 begin
 A:=TAM + 20;
