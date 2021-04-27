@@ -178,7 +178,7 @@ def p_comando(p):
     # Primeira e segunda regra semântica
     if (p[1] not in ['while', 'if', 'write', 'read']):
         if (p[1] in tabela_sim):
-            for i in p[4]:
+            for i in p[4][0]:
                 tipo_esperado = tabela_sim[p[1]]['type']
                 if (tipo_esperado != i):
                     print("\n\nErro semântico!")
@@ -216,7 +216,7 @@ def p_lista_param_aux(p):
         p[0] = 0
     else:
         p[0] = p[2]
-    
+
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
 
@@ -226,15 +226,24 @@ def p_exp_logica_aux(p):
 
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
-    p[0] = p[2] + [p[1]]
+    pprint(p[2][1])
+    p[0] = (p[2][0] + [p[1]], p[2][1])
 
 def p_exp_mat_aux(p):
     '''exp_mat_aux : OP_MAT exp_mat
                    | empty''' # empty rule
     if (p[1] != None):
-        p[0] = p[2]
+        if (p[1] == '*'):
+            ii = 'mult temp temp param' 
+        elif (p[1] == '+'):
+            ii = 'add temp temp param'
+        elif (p[1] == '-'):
+            ii = 'sub temp temp param'
+        elif (p[1] == '/'):
+            ii = 'div temp temp param'
+        p[0] = (p[2][0], p[2][1] + [ii])
     else:
-        p[0] = []
+        p[0] = ([], ['atr temp param'])
 
 def p_parametro(p):
     '''parametro : ID nome
