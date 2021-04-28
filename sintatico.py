@@ -226,8 +226,30 @@ def p_exp_logica_aux(p):
 
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
-    p[2][1][-1] = p[2][1][-1] + p[1][1]
+    instrucoes = None
+
+    if (p[1][2] == 'func'): # Chamada de função na expressão matemática
+        if (p[2][2] == 'empty'):
+            p[2][1][-1] = 'jump ' + p[1][1]
+            instrucoes = p[2][1]
+        if (p[2][2] == 'OP_MAT'):
+            instrucoes = p[2][1][:-1] + [
+                'atr temp_aux temp',
+                'jump ' + p[1][1], # jump <nome_funcao>
+                p[2][1][-1] + 'temp_aux'] # operação temp temp temp_aux
+        
+        
+
+    elif (p[1][2] == 'variavel' or p[1][2] == 'numero'):
+        # Deixando a instrução intermediária
+        # correta para parâmetros que sejam
+        # variáveis ou números
+        p[2][1][-1] = p[2][1][-1] + p[1][1]
+        instrucoes = p[2][1]
+
     p[0] = (p[2][0] + [p[1]], p[2][1])
+    p[0] = (p[2][0] + [p[1]], instrucoes)
+
     pprint(p[0][1])
 
 def p_exp_mat_aux(p):
@@ -242,14 +264,16 @@ def p_exp_mat_aux(p):
             ii = 'sub temp temp '
         elif (p[1] == '/'):
             ii = 'div temp temp '
-        p[0] = (p[2][0], p[2][1] + [ii])
+        p[0] = (p[2][0], p[2][1] + [ii], 'OP_MAT')
     else:
-        p[0] = ([], ['atr temp '])
+        p[0] = ([], ['atr temp '], 'empty')
 
 def p_parametro(p):
     '''parametro : ID nome
                  | NUMERO'''
     # p[0][1] vai ser sempre nome que vai ser posto na instrução intermediária
+    # p[0][2] ?
+    # p[0][3] o tipo de parametro (variavel, função, etc
 
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
@@ -259,20 +283,20 @@ def p_parametro(p):
             if(p[2] == 'indice_array'):
                 try:
                     if (tabela_sim[p[1]]['type'] == 'array'):
-                        p[0] = (tabela_sim[p[1]]['array_type'], p[1])
+                        p[0] = (tabela_sim[p[1]]['array_type'], p[1], 'array')
                     elif (lista_tab[0][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
-                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], p[1])
+                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], p[1], 'array')
                 except:
                     print(p[1])
                     print("Erro semântico, acessando indice de algo que não é array!!!!")  
             else: # Aqui trata o caso de ser uma variável comum em uma expressão matemática
-                p[0] = (tabela_sim[p[1]]['type'], p[1])
+                p[0] = (tabela_sim[p[1]]['type'], p[1], 'variavel')
         elif (isinstance(p[2], tuple)): # Então é record ou função
             if (p[2][0] == 'record_field'):
                 try:
                     var_interna = lista_tab[0][tabela_sim[p[1]]['type']]['var_record']
                     try:
-                        p[0] = (var_interna[p[2][1]], 'param')
+                        p[0] = (var_interna[p[2][1]], 'param', 'record')
                     except:
                         # Ultima regra
                         print("Erro semantico, tentou acessar campo não existente do record")
@@ -282,7 +306,7 @@ def p_parametro(p):
             if (p[2][0] == 'param_func'):
                 try:
                     if (lista_tab[0][p[1]]['type'] == 'function'):
-                        p[0] = (lista_tab[0][p[1]]['return_type'], p[1])
+                        p[0] = (lista_tab[0][p[1]]['return_type'], p[1], 'func')
                         if(lista_tab[0][p[1]]['n_param'] != p[2][1]):
                             # não tem o mesmo número de parametro do protótipo
                             print("não tem o mesmo número de parametro do protótipo: ", p[1])
@@ -293,9 +317,9 @@ def p_parametro(p):
                     print("não é função declarada")
     except:
          if (p[1].find('.') != -1):
-             p[0] = ('real', p[1])
+             p[0] = ('real', p[1], 'numero')
          else:
-             p[0] = ('integer', p[1])
+             p[0] = ('integer', p[1], 'numero')
 
 def p_op_logico(p):
     '''op_logico : '<'
