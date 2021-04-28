@@ -226,8 +226,9 @@ def p_exp_logica_aux(p):
 
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
-    pprint(p[2][1])
-    p[0] = (p[2][0] + [p[1]], p[2][1] + [p[2][1][-1] + p[1][1]])
+    p[2][1][-1] = p[2][1][-1] + p[1][1]
+    p[0] = (p[2][0] + [p[1]], p[2][1])
+    pprint(p[0][1])
 
 def p_exp_mat_aux(p):
     '''exp_mat_aux : OP_MAT exp_mat
@@ -258,14 +259,14 @@ def p_parametro(p):
             if(p[2] == 'indice_array'):
                 try:
                     if (tabela_sim[p[1]]['type'] == 'array'):
-                        p[0] = (tabela_sim[p[1]]['array_type'], 'param')
+                        p[0] = (tabela_sim[p[1]]['array_type'], p[1])
                     elif (lista_tab[0][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
-                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], 'param')
+                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], p[1])
                 except:
                     print(p[1])
                     print("Erro semântico, acessando indice de algo que não é array!!!!")  
-            else:
-                p[0] = (tabela_sim[p[1]]['type'], 'param')
+            else: # Aqui trata o caso de ser uma variável comum em uma expressão matemática
+                p[0] = (tabela_sim[p[1]]['type'], p[1])
         elif (isinstance(p[2], tuple)): # Então é record ou função
             if (p[2][0] == 'record_field'):
                 try:
@@ -281,7 +282,7 @@ def p_parametro(p):
             if (p[2][0] == 'param_func'):
                 try:
                     if (lista_tab[0][p[1]]['type'] == 'function'):
-                        p[0] = (lista_tab[0][p[1]]['return_type'], 'param')
+                        p[0] = (lista_tab[0][p[1]]['return_type'], p[1])
                         if(lista_tab[0][p[1]]['n_param'] != p[2][1]):
                             # não tem o mesmo número de parametro do protótipo
                             print("não tem o mesmo número de parametro do protótipo: ", p[1])
