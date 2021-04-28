@@ -180,11 +180,11 @@ def p_comando(p):
         if (p[1] in tabela_sim):
             for i in p[4][0]:
                 tipo_esperado = tabela_sim[p[1]]['type']
-                if (tipo_esperado != i):
+                if (tipo_esperado != i[0]):
                     print("\n\nErro semântico!")
                     print("Esperado o tipo: ", tipo_esperado)
-                    print("Encontrado o tipo: ", i)
-                    print("Na variável: ", p[1])
+                    print("Encontrado o tipo: ", i[0])
+                    print("Na variável: ", p[0])
                     try:
                         nome = tabela_sim['nome']
                         print("No escopo da função: ", nome)
@@ -227,27 +227,29 @@ def p_exp_logica_aux(p):
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
     pprint(p[2][1])
-    p[0] = (p[2][0] + [p[1]], p[2][1])
+    p[0] = (p[2][0] + [p[1]], p[2][1] + [p[2][1][-1] + p[1][1]])
 
 def p_exp_mat_aux(p):
     '''exp_mat_aux : OP_MAT exp_mat
                    | empty''' # empty rule
     if (p[1] != None):
         if (p[1] == '*'):
-            ii = 'mult temp temp param' 
+            ii = 'mult temp temp ' 
         elif (p[1] == '+'):
-            ii = 'add temp temp param'
+            ii = 'add temp temp '
         elif (p[1] == '-'):
-            ii = 'sub temp temp param'
+            ii = 'sub temp temp '
         elif (p[1] == '/'):
-            ii = 'div temp temp param'
+            ii = 'div temp temp '
         p[0] = (p[2][0], p[2][1] + [ii])
     else:
-        p[0] = ([], ['atr temp param'])
+        p[0] = ([], ['atr temp '])
 
 def p_parametro(p):
     '''parametro : ID nome
                  | NUMERO'''
+    # p[0][1] vai ser sempre nome que vai ser posto na instrução intermediária
+
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
     
@@ -256,20 +258,20 @@ def p_parametro(p):
             if(p[2] == 'indice_array'):
                 try:
                     if (tabela_sim[p[1]]['type'] == 'array'):
-                        p[0] = tabela_sim[p[1]]['array_type']
+                        p[0] = (tabela_sim[p[1]]['array_type'], 'param')
                     elif (lista_tab[0][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
-                        p[0] = lista_tab[0][tabela_sim[p[1]]['type']]['type_array']
+                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], 'param')
                 except:
                     print(p[1])
                     print("Erro semântico, acessando indice de algo que não é array!!!!")  
             else:
-                p[0] = tabela_sim[p[1]]['type']
+                p[0] = (tabela_sim[p[1]]['type'], 'param')
         elif (isinstance(p[2], tuple)): # Então é record ou função
             if (p[2][0] == 'record_field'):
                 try:
                     var_interna = lista_tab[0][tabela_sim[p[1]]['type']]['var_record']
                     try:
-                        p[0] = var_interna[p[2][1]]
+                        p[0] = (var_interna[p[2][1]], 'param')
                     except:
                         # Ultima regra
                         print("Erro semantico, tentou acessar campo não existente do record")
@@ -279,7 +281,7 @@ def p_parametro(p):
             if (p[2][0] == 'param_func'):
                 try:
                     if (lista_tab[0][p[1]]['type'] == 'function'):
-                        p[0] = lista_tab[0][p[1]]['return_type']
+                        p[0] = (lista_tab[0][p[1]]['return_type'], 'param')
                         if(lista_tab[0][p[1]]['n_param'] != p[2][1]):
                             # não tem o mesmo número de parametro do protótipo
                             print("não tem o mesmo número de parametro do protótipo: ", p[1])
@@ -290,9 +292,9 @@ def p_parametro(p):
                     print("não é função declarada")
     except:
          if (p[1].find('.') != -1):
-             p[0] = 'real'
+             p[0] = ('real', p[1])
          else:
-             p[0] = 'integer'
+             p[0] = ('integer', p[1])
 
 def p_op_logico(p):
     '''op_logico : '<'
