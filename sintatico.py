@@ -108,6 +108,9 @@ def p_lista_id(p):
 def p_campos(p):
     "campos : ID ':' tipo_dado lista_campos"
 
+    # p[0][0] -> 1 + p[4][0] (acho que n_param)
+    # p[0][1] -> p[4][1] + [(p[1], p[3])] (Uma lista com tuplas (ID, tipo_dado))
+
     p[0] = (1 + p[4][0], p[4][1] + [(p[1], p[3])])
 
 def p_lista_campos(p):
@@ -136,9 +139,21 @@ def p_tipo_dado(p):
 def p_funcao(p):
     '''funcao : FUNCTION new_scope nome_funcao bloco_funcao'''
     del_scope_pop()
-    tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1], "n_param" : p[3][2]}})
+    tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1], "n_param" : p[3][2][0]}})
 
-    p[0] = ['label ' + p[3][0]] + p[4] + ['return_last_jump']
+    
+    nome_da_func = p[3][0]
+
+    n_params = lista_tab[0][nome_da_func]['n_param'] 
+    params   = p[3][2][1]
+
+    carregar_params = []
+    for i in range(n_params):
+        carregar_params += ['atr ' + params[i] + ' temp_arg' + str(i)]
+
+    instrucoes_bloco = p[4]
+
+    p[0] = ['label ' + nome_da_func] + carregar_params + instrucoes_bloco + ['return_last_jump']
     pprint(p[0])
 
 def p_nome_funcao(p):
@@ -155,10 +170,19 @@ def p_param_func(p):
     '''param_func : '(' campos ')' 
                   | empty '''
 
+    # Está retornando apenas a quantidade de parâmetros
+    #
+    # p[0][0] ->  n_param
+    # p[0][1] -> lista de parametros
+
+    lista_parametros = []
+
     if (p[1] == None):
-        p[0] = 0
-    else: # Retornando o número de parâmetros
-        p[0] = p[2][0]
+        p[0] = (0, lista_parametros)
+    else: 
+        for i in range(len(p[2][1])):
+            lista_parametros += p[2][1][i][0]
+        p[0] = (p[2][0], lista_parametros)
 
     # Adcionando os parametros como variaveis no escopo interno da função
     if (p[1] != None):
@@ -167,6 +191,9 @@ def p_param_func(p):
 
 def p_bloco_funcao(p):
     '''bloco_funcao : def_var BEGIN comando lista_com END'''
+
+    # p[0] = instruções concatenadas de comando com comandos em lista_com
+
     p[0] = []
     if (p[3] != None):
         p[0] += p[3]
@@ -176,6 +203,8 @@ def p_bloco_funcao(p):
 def p_lista_com(p):
     '''lista_com : ';' comando lista_com
                  | empty''' # empty rule
+
+    # p[0] = instruções concatenadas de comando com comandos em lista_com
 
     try:
         if(p[2] != None):
@@ -228,9 +257,17 @@ def p_comando(p):
         # While!
         global n_whiles
         n_whiles += 1
-        antes = ['label while' + str(n_whiles)]
-        depois = ['jump_if while' + str(n_whiles) + ' temp'] + ['atr temp result']
-        p[0] = antes + p[3] + p[2] + depois
+
+        antes = ['label while_inicio' + str(n_whiles)]
+        antes += p[2]  
+        antes += ['inv temp']
+        antes += ['jump_if while_fim' + str(n_whiles) + ' temp']
+
+        depois = ['jump while_inicio' + str(n_whiles)]
+        depois += ['label while_fim' + str(n_whiles)]
+        depois += ['atr temp result']
+
+        p[0] = antes + p[3] + depois
 
 def p_else(p):
     '''else : ELSE bloco
@@ -308,7 +345,8 @@ def p_exp_mat(p):
     if (p[1][2] == 'func'): # Chamada de função na expressão matemática
 
         # Passar os parâmetros
-        n_params = lista_tab[0][p[1][1]]['n_param'] 
+        nome_func = p[1][1]
+        n_params = lista_tab[0][nome_func]['n_param'] 
         argumentos = p[1][3] 
         for i in range(n_params):
             adc_parametros = adc_parametros + ['atr temp_arg' + str(i) + ' ' + argumentos[i]]
@@ -438,15 +476,16 @@ def p_nome(p):
             | empty''' # empty rule
 
     # No caso de ser uma função
-    # p[0][2] é uma lista com argumentos
+    # p[0][0] é uma string que indica qual regra foi reduzida
+    # p[0][1] é o número de argumentos
+    # p[0][2] lista de parametros
 
     if (p[1] == '['):
         p[0] = 'indice_array'
     elif (p[1] == '.'):
         p[0] = ('record_field', p[2])
     elif (p[1] == '('):
-        p[0] = ('param_func', p[2][0], p[2][1]) # p[2][0] contém numero de parametros
-        # Tenho que retornar quais são os parâmetros
+        p[0] = ('param_func', p[2][0], p[2][1]) 
     else:
         p[0] = 'string'
 
