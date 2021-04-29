@@ -1,7 +1,7 @@
+import pdb
 import ply.yacc as yacc
 from lexico import tokens
 from pprint import pprint
-import pdb
 
 # Será a tabela de simbolos, implementada como um dicionário aninhado.
 tabela_sim = {}
@@ -38,6 +38,7 @@ def p_programa(p):
 
 def p_principal(p):
     'principal : BEGIN comando lista_com END'
+    pprint(p[2])
 
 def p_declaracoes(p):
     'declaracoes : def_const def_tipos def_var def_func'
@@ -159,14 +160,24 @@ def p_param_func(p):
 
 def p_bloco_funcao(p):
     '''bloco_funcao : def_var BEGIN comando lista_com END'''
+    pprint(p[2])
 
 def p_lista_com(p):
     '''lista_com : ';' comando lista_com
                  | empty''' # empty rule
 
+    try:
+        print(p[2])
+    except:
+        pass
+
 def p_bloco(p):
     '''bloco : BEGIN comando lista_com END
              | comando''' # empty rule
+    try:
+        print(p[2])
+    except:
+        print(p[1])
 
 def p_comando(p):
     '''comando : ID nome ATRIBUICAO exp_mat
@@ -177,6 +188,13 @@ def p_comando(p):
 
     # Primeira e segunda regra semântica
     if (p[1] not in ['while', 'if', 'write', 'read']):
+        # Atribuição!
+
+        p[0] = ['atr ' + p[1] + ' temp'] + p[4][1]
+
+        # print do conteúdo de exp_mat invertido
+        pprint(p[4][1][::-1])
+
         if (p[1] in tabela_sim):
             for i in p[4][0]:
                 tipo_esperado = tabela_sim[p[1]]['type']
@@ -184,7 +202,7 @@ def p_comando(p):
                     print("\n\nErro semântico!")
                     print("Esperado o tipo: ", tipo_esperado)
                     print("Encontrado o tipo: ", i[0])
-                    print("Na variável: ", p[0])
+                    print("Na variável: ", p[1])
                     try:
                         nome = tabela_sim['nome']
                         print("No escopo da função: ", nome)
@@ -195,6 +213,7 @@ def p_comando(p):
             print("\n\nErro semântico!")
             print("Referência à uma váriavel não declarada: ", p[1], "\n\n")
 
+
 def p_else(p):
     '''else : ELSE bloco
             | empty''' # empty rule
@@ -203,22 +222,31 @@ def p_lista_param(p):
     '''lista_param : parametro lista_param_aux
                    | empty''' # empty rule
 
+    # P[0] está retornando a quantidade de parâmetros,
+    # Está na hora de retornar cada um deles
+
+    # p[0][0] será a quantidade de parâmetros
+    # p[0][1] será uma lista com cada parâmetro (ci)
+    # depois de implementar devo trocar em toda ocorrencia
+
     if(p[1] != None):
-        p[0] = p[2] + 1
+        p[0] = (p[2][0] + 1, p[2][1] + [p[1][1]]) 
     else:
-        p[0] = 0
+        p[0] = (0, [])
 
 def p_lista_param_aux(p):
     '''lista_param_aux : ',' lista_param
                        | empty''' # empty rule
 
     if (p[1] == None):
-        p[0] = 0
+        p[0] = (0,[])
     else:
         p[0] = p[2]
 
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
+    pprint(p[1][1][::-1])
+
 
 def p_exp_logica_aux(p):
     '''exp_logica_aux : op_logico exp_logica
@@ -226,19 +254,32 @@ def p_exp_logica_aux(p):
 
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
-    instrucoes = None
+    
+    # p[0][0] -> p[2][0] + [p[1]]
+    # p[0][1] -> instrucoes
+
+    instrucoes = []
+    adc_parametros = []
 
     if (p[1][2] == 'func'): # Chamada de função na expressão matemática
+
+        # Passar os parâmetros
+        n_params = lista_tab[0][p[1][1]]['n_param'] 
+        argumentos = p[1][3] 
+        for i in range(n_params):
+            adc_parametros = adc_parametros + ['atr temp_arg' + str(i) + ' ' + argumentos[i]]
+
         if (p[2][2] == 'empty'):
             p[2][1][-1] = 'jump ' + p[1][1]
             instrucoes = p[2][1]
+
         if (p[2][2] == 'OP_MAT'):
             instrucoes = p[2][1][:-1] + [
                 'atr temp_aux temp',
                 'jump ' + p[1][1], # jump <nome_funcao>
                 p[2][1][-1] + 'temp_aux'] # operação temp temp temp_aux
-        
-        
+
+        instrucoes = instrucoes + adc_parametros
 
     elif (p[1][2] == 'variavel' or p[1][2] == 'numero'):
         # Deixando a instrução intermediária
@@ -247,14 +288,17 @@ def p_exp_mat(p):
         p[2][1][-1] = p[2][1][-1] + p[1][1]
         instrucoes = p[2][1]
 
-    p[0] = (p[2][0] + [p[1]], p[2][1])
     p[0] = (p[2][0] + [p[1]], instrucoes)
 
-    pprint(p[0][1])
 
 def p_exp_mat_aux(p):
     '''exp_mat_aux : OP_MAT exp_mat
                    | empty''' # empty rule
+
+    # p[0][0] -> ṕ[2][0]
+    # p[0][1] -> p[2][1] + [ii]
+    # p[0][2] -> qual das duas regras: 'OP_MAT' ou 'empty'?
+
     if (p[1] != None):
         if (p[1] == '*'):
             ii = 'mult temp temp ' 
@@ -271,9 +315,12 @@ def p_exp_mat_aux(p):
 def p_parametro(p):
     '''parametro : ID nome
                  | NUMERO'''
-    # p[0][1] vai ser sempre nome que vai ser posto na instrução intermediária
-    # p[0][2] ?
-    # p[0][3] o tipo de parametro (variavel, função, etc
+    # p[0][0] 
+    # p[0][1] esse é o ID
+    # p[0][2] o tipo de parametro (variavel, função, etc
+
+    # no caso de ser uma função
+    # p[0][3] é uma lista com argumentos
 
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
@@ -284,40 +331,51 @@ def p_parametro(p):
                 try:
                     if (tabela_sim[p[1]]['type'] == 'array'):
                         p[0] = (tabela_sim[p[1]]['array_type'], p[1], 'array')
+
                     elif (lista_tab[0][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
                         p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], p[1], 'array')
+
                 except:
                     print(p[1])
                     print("Erro semântico, acessando indice de algo que não é array!!!!")  
+
             else: # Aqui trata o caso de ser uma variável comum em uma expressão matemática
                 p[0] = (tabela_sim[p[1]]['type'], p[1], 'variavel')
+
         elif (isinstance(p[2], tuple)): # Então é record ou função
             if (p[2][0] == 'record_field'):
                 try:
                     var_interna = lista_tab[0][tabela_sim[p[1]]['type']]['var_record']
                     try:
                         p[0] = (var_interna[p[2][1]], 'param', 'record')
+
                     except:
                         # Ultima regra
                         print("Erro semantico, tentou acessar campo não existente do record")
+
                 except:
                     # penultima regra
                     print("Erro semântico, variável não é do tipo record: ", p[1])
+
             if (p[2][0] == 'param_func'):
                 try:
                     if (lista_tab[0][p[1]]['type'] == 'function'):
-                        p[0] = (lista_tab[0][p[1]]['return_type'], p[1], 'func')
+                        p[0] = (lista_tab[0][p[1]]['return_type'], p[1], 'func', p[2][2])
                         if(lista_tab[0][p[1]]['n_param'] != p[2][1]):
                             # não tem o mesmo número de parametro do protótipo
                             print("não tem o mesmo número de parametro do protótipo: ", p[1])
+
                     else:
                         print("não é função declarada", p[1])
+
                 except:
                     # não é função declarada
                     print("não é função declarada")
+
     except:
          if (p[1].find('.') != -1):
              p[0] = ('real', p[1], 'numero')
+
          else:
              p[0] = ('integer', p[1], 'numero')
 
@@ -333,12 +391,16 @@ def p_nome(p):
             | '(' lista_param ')'
             | empty''' # empty rule
 
+    # No caso de ser uma função
+    # p[0][2] é uma lista com argumentos
+
     if (p[1] == '['):
         p[0] = 'indice_array'
     elif (p[1] == '.'):
         p[0] = ('record_field', p[2])
     elif (p[1] == '('):
-        p[0] = ('param_func', p[2]) # p[2] contém numero de parametros
+        p[0] = ('param_func', p[2][0], p[2][1]) # p[2][0] contém numero de parametros
+        # Tenho que retornar quais são os parâmetros
     else:
         p[0] = 'string'
 
