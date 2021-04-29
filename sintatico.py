@@ -61,7 +61,10 @@ def p_def_tipos(p):
 def p_def_var(p):
     '''def_var : variavel def_var
                | empty''' # empty rule
-    p[0] = []
+    if (p[1] == None):
+        p[0] = []
+    else:
+        p[0] = p[1] + p[2]
 
 def p_def_func(p):
     '''def_func : funcao def_func
@@ -104,6 +107,8 @@ def p_variavel(p):
     if (p[3]):
         for i in p[3]:
             tabela_sim.update({i: {'type':p[5]}})
+
+    p[0] = ['atr ' + p[2]] + p[3]
     
 def p_lista_id(p):
     '''lista_id : ',' ID lista_id
@@ -114,6 +119,8 @@ def p_lista_id(p):
             p[0] = p[3] + [p[2]]
         else:
             p[0] = [p[2]]
+    else:
+        p[0] = []
 
 def p_campos(p):
     "campos : ID ':' tipo_dado lista_campos"
@@ -224,6 +231,9 @@ def p_lista_com(p):
 def p_bloco(p):
     '''bloco : BEGIN comando lista_com END
              | comando''' # empty rule
+
+    # p[0] -> Lista com instrucoes
+
     try:
         if (p[2] != None):
             p[0] = p[2]
@@ -278,9 +288,38 @@ def p_comando(p):
 
         p[0] = antes + p[3] + depois
 
+    if (p[1] == 'if' and p[2] != None):
+        # if!
+        
+        if (len(p[5]) == 0):
+            # Aqui não tem else
+
+            p[0] = p[2]
+            p[0] += ['jump_if if_fim temp']
+            p[0] += p[4]
+            p[0] += ['label if_fim']
+
+        else:
+            # Aqui tem else
+
+            p[0] = p[2]
+            p[0] += ['jump_if if_else temp']
+            p[0] += p[4]
+            p[0] += ['jump if_fim' ]
+            p[0] += ['label if_else' ]
+            p[0] += p[5]
+            p[0] += ['label if_fim']
+ 
+
+
 def p_else(p):
     '''else : ELSE bloco
             | empty''' # empty rule
+
+    if (p[1] != None):
+       p[0] = p[2] 
+    else:
+        p[0] = []
 
 def p_lista_param(p):
     '''lista_param : parametro lista_param_aux
@@ -309,6 +348,9 @@ def p_lista_param_aux(p):
 
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
+
+    # p[0] -> Lista de instruções
+
     if (p[2] != None):
         p[0] = p[2][0] + p[1][1] + p[2][1]
     else:
@@ -412,6 +454,8 @@ def p_parametro(p):
 
     # no caso de ser uma função
     # p[0][3] é uma lista com argumentos
+
+    # no caso de ser um array
 
     # Se der erro é porque é numero
     # Estamos retornando o tipo pra faze a segunda regra semantica
@@ -598,7 +642,7 @@ end
 begin
 A:=TAM + 20;
 B := fatorial(A);
-C := exp(A,B);
+C:= exp(A,B);
 D := media(E);
 F := lerDados()
 end
