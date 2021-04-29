@@ -38,7 +38,7 @@ def p_programa(p):
 
 def p_principal(p):
     'principal : BEGIN comando lista_com END'
-    pprint(p[2])
+    pprint(p[2][::-1])
 
 def p_declaracoes(p):
     'declaracoes : def_const def_tipos def_var def_func'
@@ -61,7 +61,6 @@ def p_def_func(p):
 
 def p_constante(p):
     '''constante : CONST ID '=' const_valor ';' '''
-    print("Constante reconhecido")
 
 def p_const_valor(p):
     '''const_valor : CONST_VALOR
@@ -134,7 +133,7 @@ def p_tipo_dado(p):
 def p_funcao(p):
     '''funcao : FUNCTION new_scope nome_funcao bloco_funcao'''
     print("Escopo da função:", p[3][0])
-    pprint(tabela_sim)
+    # pprint(tabela_sim)
     print("\n")
     del_scope_pop()
     tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1], "n_param" : p[3][2]}})
@@ -160,14 +159,15 @@ def p_param_func(p):
 
 def p_bloco_funcao(p):
     '''bloco_funcao : def_var BEGIN comando lista_com END'''
-    pprint(p[2])
+    if (p[3] != None):
+        pprint(p[3])
 
 def p_lista_com(p):
     '''lista_com : ';' comando lista_com
                  | empty''' # empty rule
 
     try:
-        print(p[2])
+        pprint(p[2])
     except:
         pass
 
@@ -189,11 +189,7 @@ def p_comando(p):
     # Primeira e segunda regra semântica
     if (p[1] not in ['while', 'if', 'write', 'read']):
         # Atribuição!
-
-        p[0] = ['atr ' + p[1] + ' temp'] + p[4][1]
-
-        # print do conteúdo de exp_mat invertido
-        pprint(p[4][1][::-1])
+        p[0] = p[4][1] + ['atr ' + p[1] + ' temp']
 
         if (p[1] in tabela_sim):
             for i in p[4][0]:
@@ -213,6 +209,8 @@ def p_comando(p):
             print("\n\nErro semântico!")
             print("Referência à uma váriavel não declarada: ", p[1], "\n\n")
 
+    if (p[1] == 'while' and p[2] != None):
+        p[0] = ['Fazer while na expressão logica'] + p[2]
 
 def p_else(p):
     '''else : ELSE bloco
@@ -245,12 +243,38 @@ def p_lista_param_aux(p):
 
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
-    pprint(p[1][1][::-1])
+    if (p[2] != None):
+        p[0] = p[2][0] + p[1][1] + p[2][1]
+    else:
+        p[0] = p[1][1]
 
 
 def p_exp_logica_aux(p):
     '''exp_logica_aux : op_logico exp_logica
                       | empty''' # empty rule
+
+    # p[0][0] -> antes
+    # p[0][1] -> depois 
+
+    try:
+        if (p[2] != None):
+            antes = p[2] + ['atr temp_aux temp']
+            depois = []
+
+            if (p[1] == '<'):
+                depois = ['menor_que temp temp temp_aux']
+            if (p[1] == '>'):
+                depois = ['maior_que temp temp temp_aux']
+            if (p[1] == '='):
+                depois = ['eq temp temp temp_aux']
+            if (p[1] == '!'):
+                depois = ['inv temp temp']
+
+        p[0] = (antes, depois)
+
+    except:
+        p[0] = None
+
 
 def p_exp_mat(p):
     '''exp_mat : parametro exp_mat_aux'''
@@ -283,7 +307,7 @@ def p_exp_mat(p):
 
     elif (p[1][2] == 'variavel' or p[1][2] == 'numero'):
         # Deixando a instrução intermediária
-        # correta para parâmetros que sejam
+        # correta para parâmetros que seyam
         # variáveis ou números
         p[2][1][-1] = p[2][1][-1] + p[1][1]
         instrucoes = p[2][1]
@@ -384,6 +408,8 @@ def p_op_logico(p):
                  | '>'
                  | '='
                  | '!' '''
+
+    p[0] = p[1]
 
 def p_nome(p):
     '''nome : '.' ID nome
