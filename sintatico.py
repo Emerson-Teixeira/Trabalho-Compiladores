@@ -3,6 +3,9 @@ import ply.yacc as yacc
 from lexico import tokens
 from pprint import pprint
 
+# Quantidade de whiles no código, para fazer labels separados no codigo intermediario
+n_whiles = 0
+
 # Será a tabela de simbolos, implementada como um dicionário aninhado.
 tabela_sim = {}
 
@@ -132,14 +135,19 @@ def p_tipo_dado(p):
 
 def p_funcao(p):
     '''funcao : FUNCTION new_scope nome_funcao bloco_funcao'''
-    print("Escopo da função:", p[3][0])
-    # pprint(tabela_sim)
-    print("\n")
     del_scope_pop()
     tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1], "n_param" : p[3][2]}})
 
+    p[0] = ['label ' + p[3][0]] + p[4] + ['return_last_jump']
+    pprint(p[0])
+
 def p_nome_funcao(p):
     '''nome_funcao : ID param_func ':' tipo_dado'''
+
+    # p[0][0] -> ID
+    # p[0][1] -> tipo_dado
+    # p[0][2] -> param_func
+
     tabela_sim.update({'result' : {'type' : p[4]}, 'nome' : p[1]})
     p[0] = (p[1], p[4], p[2])
 
@@ -159,25 +167,32 @@ def p_param_func(p):
 
 def p_bloco_funcao(p):
     '''bloco_funcao : def_var BEGIN comando lista_com END'''
+    p[0] = []
     if (p[3] != None):
-        pprint(p[3])
+        p[0] += p[3]
+    if (p[4] != None):
+        p[0] += p[4]
 
 def p_lista_com(p):
     '''lista_com : ';' comando lista_com
                  | empty''' # empty rule
 
     try:
-        pprint(p[2])
+        if(p[2] != None):
+            p[0] = p[2] + p[3]
     except:
-        pass
+        p[0] = []
 
 def p_bloco(p):
     '''bloco : BEGIN comando lista_com END
              | comando''' # empty rule
     try:
-        print(p[2])
+        if (p[2] != None):
+            p[0] = p[2]
+        if (p[3] != None):
+            p[0] += p[3]
     except:
-        print(p[1])
+        p[0] = []
 
 def p_comando(p):
     '''comando : ID nome ATRIBUICAO exp_mat
@@ -210,7 +225,12 @@ def p_comando(p):
             print("Referência à uma váriavel não declarada: ", p[1], "\n\n")
 
     if (p[1] == 'while' and p[2] != None):
-        p[0] = ['Fazer while na expressão logica'] + p[2]
+        # While!
+        global n_whiles
+        n_whiles += 1
+        antes = ['label while' + str(n_whiles)]
+        depois = ['jump_if while' + str(n_whiles) + ' temp'] + ['atr temp result']
+        p[0] = antes + p[3] + p[2] + depois
 
 def p_else(p):
     '''else : ELSE bloco
