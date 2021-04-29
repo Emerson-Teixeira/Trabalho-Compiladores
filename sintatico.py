@@ -37,30 +37,40 @@ def del_scope_pop():
 
 def p_programa(p):
     'programa : declaracoes principal'
-    p[0] = 'Concluido'
+    pprint(p[1] + p[2])
+    p[0] = 'Concluído'
 
 def p_principal(p):
     'principal : BEGIN comando lista_com END'
-    pprint(p[2][::-1])
+    p[0] = p[2] + p[3]
 
 def p_declaracoes(p):
     'declaracoes : def_const def_tipos def_var def_func'
+    p[0] = p[1] + p[2] + p[3] + p[4]
 
 def p_def_const(p):
     '''def_const : constante def_const
                  | empty''' # empty rule
+    p[0] = []
     
 def p_def_tipos(p):
     '''def_tipos : tipo def_tipos
                  | empty''' # empty rule
+    p[0] = []
 
 def p_def_var(p):
     '''def_var : variavel def_var
                | empty''' # empty rule
+    p[0] = []
 
 def p_def_func(p):
     '''def_func : funcao def_func
                 | empty'''
+
+    if (p[1] != None):
+        p[0] = p[1] + p[2]
+    else:
+        p[0] = []
 
 def p_constante(p):
     '''constante : CONST ID '=' const_valor ';' '''
@@ -153,8 +163,7 @@ def p_funcao(p):
 
     instrucoes_bloco = p[4]
 
-    p[0] = ['label ' + nome_da_func] + carregar_params + instrucoes_bloco + ['return_last_jump']
-    pprint(p[0])
+    p[0] = ['label ' + nome_da_func] + carregar_params + instrucoes_bloco + ['return_last_fjump']
 
 def p_nome_funcao(p):
     '''nome_funcao : ID param_func ':' tipo_dado'''
@@ -352,16 +361,16 @@ def p_exp_mat(p):
             adc_parametros = adc_parametros + ['atr temp_arg' + str(i) + ' ' + argumentos[i]]
 
         if (p[2][2] == 'empty'):
-            p[2][1][-1] = 'jump ' + p[1][1]
+            p[2][1][-1] = 'fjump ' + p[1][1]
             instrucoes = p[2][1]
 
         if (p[2][2] == 'OP_MAT'):
             instrucoes = p[2][1][:-1] + [
                 'atr temp_aux temp',
-                'jump ' + p[1][1], # jump <nome_funcao>
+                'fjump ' + p[1][1], # jump <nome_funcao>
                 p[2][1][-1] + 'temp_aux'] # operação temp temp temp_aux
 
-        instrucoes = instrucoes + adc_parametros
+        instrucoes = adc_parametros + instrucoes 
 
     elif (p[1][2] == 'variavel' or p[1][2] == 'numero'):
         # Deixando a instrução intermediária
@@ -594,8 +603,6 @@ D := media(E);
 F := lerDados()
 end
 '''))
-
-pprint(tabela_sim)
 
 """
 while True:
