@@ -198,7 +198,8 @@ def p_funcao(p):
 
     instrucoes_bloco = p[4]
 
-    p[0] = ['label ' + nome_da_func] + carregar_params + instrucoes_bloco + ['return_last_fjump']
+    p[0] = ['label ' + nome_da_func] + carregar_params + instrucoes_bloco
+    p[0] += ['atr temp result'] + ['return_last_fjump']
 
 def p_nome_funcao(p):
     '''nome_funcao : ID param_func ':' tipo_dado'''
@@ -300,6 +301,18 @@ def p_comando(p):
         else:
             print("\n\nErro semântico!")
             print("Referência à uma váriavel não declarada: ", p[1], "\n\n")
+
+    if (p[1] == 'read'):
+        identificador = p[2]
+        nome = p[3]
+
+        if (nome[0] == 'record_field'):
+            instrucao = ['read ' + identificador + '.' + nome[1]]
+        else:
+            instrucao = []
+
+        p[0] = instrucao
+ 
 
     if (p[1] == 'while' and p[2] != None):
         # While!
@@ -423,17 +436,19 @@ def p_exp_mat(p):
     # p[0][1] -> instrucoes
 
     instrucoes = []
-    adc_parametros = []
 
-    if (p[1][2] == 'array'): # Acessando uma posição de array dentro da expressão
+    if (p[1][2] == 'record'):
+        instrucoes += p[1][3]
+
+    elif (p[1][2] == 'array'): # Acessando uma posição de array dentro da expressão
         id_array = p[1][1]
         indice_array = str(p[1][3])
         instrucoes = ['acess_array temp ' + id_array + ' ' + indice_array] 
 
-    if (p[1][2] == 'func'): # Chamada de função na expressão matemática
-
+    elif (p[1][2] == 'func'): # Chamada de função na expressão matemática
         # Passar os parâmetros
         nome_func = p[1][1]
+        adc_parametros = []
         n_params = lista_tab[0][nome_func]['n_param'] 
         argumentos = p[1][3] 
         for i in range(n_params):
@@ -506,10 +521,12 @@ def p_parametro(p):
                     print("Erro semântico, acessando indice de algo que não é array!!!!")
 
             if (p[2][0] == 'record_field'):
+                id_campo = p[2][1]
+                instrucao = ['acess_record temp' + p[1] + '.' + id_camp]
                 try:
                     var_interna = lista_tab[0][tabela_sim[p[1]]['type']]['var_record']
                     try:
-                        p[0] = (var_interna[p[2][1]], 'param', 'record')
+                        p[0] = (var_interna[id_campo], 'param', 'record', instrucao)
 
                     except:
                         # Ultima regra
@@ -563,7 +580,8 @@ def p_nome(p):
     if (p[1] == '['):
         p[0] = ('indice_array', p[2][1])
     elif (p[1] == '.'):
-        p[0] = ('record_field', p[2])
+        iden = p[2] 
+        p[0] = ('record_field', iden)
     elif (p[1] == '('):
         p[0] = ('param_func', p[2][0], p[2][1]) 
     else:
@@ -639,8 +657,7 @@ function lerDados : aluno
 begin
 write "digite as notas do aluno";
 read result.nota1;
-read result.nota2;
-read result.nota3
+read result.nota2
 end
 function maior(a : vetor) : integer
 var i : integer;
