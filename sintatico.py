@@ -293,7 +293,7 @@ def p_comando(p):
 
         p[0] = antes + p[3] + depois
 
-    if (p[1] == 'if' and p[2] != None):
+    if (p[1] == 'if'):
         # if!
         
         if (len(p[5]) == 0):
@@ -354,12 +354,15 @@ def p_lista_param_aux(p):
 def p_exp_logica(p):
     '''exp_logica : exp_mat exp_logica_aux'''
 
-    # p[0] -> Lista de instruções
+    instrucoes_exp_mat = p[1][1]
 
     if (p[2] != None):
-        p[0] = p[2][0] + p[1][1] + p[2][1]
+        exp_log_antes = p[2][0]
+        exp_log_depois = p[2][1]
+
+        p[0] = exp_log_antes + instrucoes_exp_mat + exp_log_depois 
     else:
-        p[0] = p[1][1]
+        p[0] = instrucoes_exp_mat 
 
 
 def p_exp_logica_aux(p):
@@ -398,6 +401,11 @@ def p_exp_mat(p):
     instrucoes = []
     adc_parametros = []
 
+    if (p[1][2] == 'array'): # Acessando uma posição de array dentro da expressão
+        id_array = p[1][1]
+        indice_array = str(p[1][3])
+        instrucoes = ['acess_array temp ' + id_array + ' ' + indice_array] 
+
     if (p[1][2] == 'func'): # Chamada de função na expressão matemática
 
         # Passar os parâmetros
@@ -410,7 +418,7 @@ def p_exp_mat(p):
         if (p[2][2] == 'empty'):
             p[2][1][-1] = 'fjump ' + p[1][1]
             instrucoes = p[2][1]
-
+            
         if (p[2][2] == 'OP_MAT'):
             instrucoes = p[2][1][:-1] + [
                 'atr temp_aux temp',
@@ -453,36 +461,26 @@ def p_exp_mat_aux(p):
 def p_parametro(p):
     '''parametro : ID nome
                  | NUMERO'''
-    # p[0][0] 
-    # p[0][1] esse é o ID
-    # p[0][2] o tipo de parametro (variavel, função, etc
-
-    # no caso de ser uma função
-    # p[0][3] é uma lista com argumentos
-
-    # no caso de ser um array
-
-    # Se der erro é porque é numero
-    # Estamos retornando o tipo pra faze a segunda regra semantica
     
     try:
         if (isinstance(p[2], str)):
-            if(p[2] == 'indice_array'):
+            # Aqui trata o caso de ser uma variável comum em uma expressão matemática
+            p[0] = (tabela_sim[p[1]]['type'], p[1], 'variavel')
+
+        elif (isinstance(p[2], tuple)):
+            if(p[2][0] == 'indice_array'):
+                indice = p[2][1]
                 try:
                     if (tabela_sim[p[1]]['type'] == 'array'):
-                        p[0] = (tabela_sim[p[1]]['array_type'], p[1], 'array')
+                        p[0] = (tabela_sim[p[1]]['array_type'], p[1], 'array', indice)
 
                     elif (lista_tab[0][tabela_sim[p[1]]['type']]['ttype'] == 'array'):
-                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], p[1], 'array')
+                        p[0] = (lista_tab[0][tabela_sim[p[1]]['type']]['type_array'], p[1], 'array', indice)
 
                 except:
                     print(p[1])
-                    print("Erro semântico, acessando indice de algo que não é array!!!!")  
+                    print("Erro semântico, acessando indice de algo que não é array!!!!")
 
-            else: # Aqui trata o caso de ser uma variável comum em uma expressão matemática
-                p[0] = (tabela_sim[p[1]]['type'], p[1], 'variavel')
-
-        elif (isinstance(p[2], tuple)): # Então é record ou função
             if (p[2][0] == 'record_field'):
                 try:
                     var_interna = lista_tab[0][tabela_sim[p[1]]['type']]['var_record']
@@ -539,7 +537,7 @@ def p_nome(p):
     # p[0][2] lista de parametros
 
     if (p[1] == '['):
-        p[0] = 'indice_array'
+        p[0] = ('indice_array', p[2][1])
     elif (p[1] == '.'):
         p[0] = ('record_field', p[2])
     elif (p[1] == '('):
