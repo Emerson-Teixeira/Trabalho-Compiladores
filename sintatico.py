@@ -268,7 +268,7 @@ def p_bloco(p):
         if (p[3] != None):
             p[0] += p[3]
     except:
-        p[0] = []
+        p[0] = p[1]
 
 def p_comando(p):
     '''comando : ID nome ATRIBUICAO exp_mat
