@@ -64,7 +64,7 @@ def p_def_var(p):
     if (p[1] == None):
         p[0] = []
     else:
-        p[0] = p[1] + p[2]
+        p[0] = p[1][0] + p[2]
 
 def p_def_func(p):
     '''def_func : funcao def_func
@@ -92,13 +92,16 @@ def p_tipo(p):
             for i in p[4][1][1]: # Lista vinda da regra campos
                 tabela_sim[p[2]]['var_record'].update({i[0] : {'type' : i[1]}})
 
-
 def p_variavel(p):
     "variavel : VAR ID lista_id ':' tipo_dado ';'"
     
     # Essa linha deve adcionar um registro na tabela de símbolos
     # O registro vai ser uma entrada no dicionário "tabela_sim"
     # Que liga o ID à uma outra tabela, com campos variados como type
+
+    # p[0][0] -> lista com ids
+    # p[0][1] -> o tipo de dado
+    
     if (isinstance(p[5], tuple)):
         tabela_sim.update({p[2] : {'type': p[5][0], 'type_array' : p[5][1]}})
         
@@ -108,7 +111,10 @@ def p_variavel(p):
         for i in p[3]:
             tabela_sim.update({i: {'type':p[5]}})
 
-    p[0] = ['atr ' + p[2]] + p[3]
+    tipo_dado = p[5]
+    lista_ids = [p[2]] + p[3]
+
+    p[0] = (lista_ids, tipo_dado)
     
 def p_lista_id(p):
     '''lista_id : ',' ID lista_id
@@ -158,7 +164,6 @@ def p_funcao(p):
     del_scope_pop()
     tabela_sim.update({p[3][0] : {"type" : "function", "return_type" : p[3][1], "n_param" : p[3][2][0]}})
 
-    
     nome_da_func = p[3][0]
 
     n_params = lista_tab[0][nome_da_func]['n_param'] 
@@ -247,7 +252,7 @@ def p_comando(p):
                | WHILE exp_logica bloco
                | IF exp_logica THEN bloco else
                | WRITE const_valor
-               | READ ID nome'''
+               | READ ID nome''' 
 
     # Primeira e segunda regra semântica
     if (p[1] not in ['while', 'if', 'write', 'read']):
@@ -526,7 +531,7 @@ def p_nome(p):
     '''nome : '.' ID nome
             | '[' parametro ']'
             | '(' lista_param ')'
-            | empty''' # empty rule
+            | empty''' # variavel normal!
 
     # No caso de ser uma função
     # p[0][0] é uma string que indica qual regra foi reduzida
@@ -647,6 +652,8 @@ D := media(E);
 F := lerDados()
 end
 '''))
+
+pprint(tabela_sim)
 
 """
 while True:
