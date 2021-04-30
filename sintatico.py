@@ -238,11 +238,12 @@ def p_bloco_funcao(p):
 
     # p[0] = instruções concatenadas de comando com comandos em lista_com
 
-    p[0] = []
+    p[0] = p[1]
     if (p[3] != None):
         p[0] += p[3]
     if (p[4] != None):
         p[0] += p[4]
+
 
 def p_lista_com(p):
     '''lista_com : ';' comando lista_com
