@@ -64,7 +64,7 @@ def p_def_var(p):
     if (p[1] == None):
         p[0] = []
     else:
-        p[0] = p[1][0] + p[2]
+        p[0] = p[1] + p[2]
 
 def p_def_func(p):
     '''def_func : funcao def_func
@@ -101,20 +101,43 @@ def p_variavel(p):
 
     # p[0][0] -> lista com ids
     # p[0][1] -> o tipo de dado
-    
-    if (isinstance(p[5], tuple)):
-        tabela_sim.update({p[2] : {'type': p[5][0], 'type_array' : p[5][1]}})
-        
+
+    def criaIntermediario(tipoData, listaDados, firstId):
+        arrayInstrucoes = []
+        arrayInstrucoes.append(('Def_var',firstId,tipoData))
+        for x in listaDados:
+            arrayInstrucoes.append(('Def_var',x,tipoData))
+        return arrayInstrucoes
+
+    def criaIntermediarioFinal(arrayInstrucoes):
+        instrucoesFinais = []
+        for x in arrayInstrucoes:
+            if(x[2] == 'integer' or x[2] == 'real'):
+                instrucoesFinais.append('Def_var ' + x[1] + ' ' + x[2])
+            elif(lista_tab[0][x[2]]['ttype'] == 'array'):
+                instrucoesFinais.append('Def_array ' + x[1]+ ' ' + lista_tab[0][x[2]]['type_array']+ ' ' + lista_tab[0][x[2]]['n_indices'])
+            elif(lista_tab[0][x[2]]['ttype'] == 'record'):
+                for y in lista_tab[0][x[2]]['var_record']:
+                    instrucoesFinais.append('Def_record ' + x[1] +'.' + y+ ' ' + lista_tab[0][x[2]]['var_record'][y]['type'])
+        return instrucoesFinais
+                
     tabela_sim.update({p[2]: {'type':p[5]}})
 
     if (p[3]):
         for i in p[3]:
             tabela_sim.update({i: {'type':p[5]}})
 
-    tipo_dado = p[5]
-    lista_ids = [p[2]] + p[3]
+    if(isinstance(p[5], tuple)): #dar uma olhada depois
+        if(p[5][0] == 'array'):
+            tabela_sim.update({p[2] : {'type': p[5][0], 'type_array' : p[5][1]}})
 
-    p[0] = (lista_ids, tipo_dado)
+    teste = criaIntermediario(p[5],p[3],p[2])
+    p[0] = criaIntermediarioFinal(teste)
+    tabela_sim.update({p[2]: {'type':p[5]}})
+
+    if (p[3]):
+        for i in p[3]:
+            tabela_sim.update({i: {'type':p[5]}})
     
 def p_lista_id(p):
     '''lista_id : ',' ID lista_id
