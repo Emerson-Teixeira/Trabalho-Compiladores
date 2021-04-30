@@ -82,6 +82,8 @@ def p_const_valor(p):
     '''const_valor : CONST_VALOR
                    | exp_mat'''
 
+    p[0] = p[1]
+
 def p_tipo(p):
     '''tipo : TYPE ID '=' tipo_dado ';' '''
     if (isinstance(p[4], tuple)):
@@ -302,7 +304,11 @@ def p_comando(p):
             print("\n\nErro semântico!")
             print("Referência à uma váriavel não declarada: ", p[1], "\n\n")
 
-    if (p[1] == 'read'):
+    if (p[1] == 'write'):
+        const_valor = p[2]
+        p[0] = ['write ' + const_valor]
+
+    elif (p[1] == 'read'):
         identificador = p[2]
         nome = p[3]
 
@@ -314,7 +320,7 @@ def p_comando(p):
         p[0] = instrucao
  
 
-    if (p[1] == 'while' and p[2] != None):
+    elif (p[1] == 'while' and p[2] != None):
         # While!
         global n_whiles
         n_whiles += 1
@@ -330,7 +336,7 @@ def p_comando(p):
 
         p[0] = antes + p[3] + depois
 
-    if (p[1] == 'if'):
+    elif (p[1] == 'if'):
         # if!
         
         if (len(p[5]) == 0):
