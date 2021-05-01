@@ -643,7 +643,8 @@ type aluno = record
 nota1 : real;
 nota2 : real
 end;
-var A, B, C, D : integer;
+var A, B, D : integer;
+var C : real;
 var E : vetor;
 var F : aluno;
 function fatorial(a:integer) : integer
@@ -658,17 +659,17 @@ i:=i+1
 end
 end
 function exp(a: real; b: real) : real
-var i : integer;
+var i : real;
 begin
-i := 1;
+i := 1.0;
 result := a;
 if b = 0 then
-result := 1
+result := 1.0
 else
 while i < b
 begin
 result := a * a;
-i := i + 1
+i := i + 1.0
 end
 end
 function lerDados : aluno
@@ -709,8 +710,6 @@ D := media(E);
 F := lerDados()
 end
 '''))
-
-pprint(tabela_sim)
 
 """
 while True:
