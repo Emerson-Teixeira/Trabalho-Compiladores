@@ -51,7 +51,12 @@ def p_declaracoes(p):
 def p_def_const(p):
     '''def_const : constante def_const
                  | empty''' # empty rule
-    p[0] = []
+    if (p[1] != None):
+        constante = p[1]
+        outras_constantes = p[2]
+        p[0] = constante + outras_constantes
+    else:
+        p[0] = []
     
 def p_def_tipos(p):
     '''def_tipos : tipo def_tipos
@@ -77,12 +82,19 @@ def p_def_func(p):
 
 def p_constante(p):
     '''constante : CONST ID '=' const_valor ';' '''
+    identificador = p[2]
+    valor_da_constante = p[4]
+
+    p[0] = ['def_const ' + identificador + ' ' + valor_da_constante]
 
 def p_const_valor(p):
     '''const_valor : CONST_VALOR
                    | exp_mat'''
 
-    p[0] = p[1]
+    if (isinstance(p[1], tuple)):
+        p[0] = p[1][0][0][1] 
+    else:
+        p[0] = p[1]
 
 def p_tipo(p):
     '''tipo : TYPE ID '=' tipo_dado ';' '''
